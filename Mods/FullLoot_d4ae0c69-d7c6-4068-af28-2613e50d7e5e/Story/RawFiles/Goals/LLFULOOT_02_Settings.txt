@@ -1,0 +1,103 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+
+KBSECTION
+
+IF
+DialogStarted("LLFULOOT_SettingsMenu", _Instance)
+AND
+DialogGetInvolvedPlayer(_Instance, 1, (CHARACTERGUID)_Player)
+AND
+CharacterGetHostCharacter(_Host)
+AND
+CharacterGetReservedUserID(_Host, _UserID)
+AND
+CharacterGetReservedUserID(_Player, _UserID)
+THEN
+ObjectSetFlag(_Player, "LLFULOOT_IsHost");
+
+IF
+DialogEnded("LLFULOOT_SettingsMenu", _Instance)
+AND
+DialogGetInvolvedPlayer(_Instance, 1, (CHARACTERGUID)_Player)
+THEN
+ObjectClearFlag(_Player, "LLFULOOT_IsHost");
+ObjectClearFlag(_Player, "LLFULOOT_CanGetNewBook");
+
+IF
+DialogStarted("LLFULOOT_SettingsMenu", _Instance)
+AND
+DialogGetInvolvedPlayer(_Instance, 1, (CHARACTERGUID)_Player)
+AND
+ItemTemplateIsInUserInventory(_Player, "BOOK_LLFULOOT_SettingsMenu_7056c5bd-5d3a-44c3-8511-df02f6464ccf", 0, 0)
+THEN
+ObjectSetFlag(_Player, "LLFULOOT_CanGetNewBook");
+
+IF
+ObjectFlagSet("LLFULOOT_AddSettingsBook", _Character, _)
+THEN
+ObjectClearFlag(_Character, "LLFULOOT_CanGetNewBook");
+ObjectClearFlag(_Character, "LLFULOOT_AddSettingsBook");
+ItemTemplateAddTo("BOOK_LLFULOOT_SettingsMenu_7056c5bd-5d3a-44c3-8511-df02f6464ccf", _Character, 1, 0);
+
+IF
+GameStarted(_Region, _)
+AND
+IsGameLevel(_Region, 1)
+AND
+GlobalGetFlag("LLFULOOT_SettingsBookAdded", 0)
+AND
+CharacterGetHostCharacter(_Host)
+AND
+ItemTemplateIsInPartyInventory(_Host, "BOOK_LLFULOOT_SettingsMenu_7056c5bd-5d3a-44c3-8511-df02f6464ccf", 0, 0)
+THEN
+GlobalSetFlag("LLFULOOT_SettingsBookAdded");
+ItemTemplateAddTo("BOOK_LLFULOOT_SettingsMenu_7056c5bd-5d3a-44c3-8511-df02f6464ccf", _Host, 1, 0);
+
+IF
+GameStarted(_, 1)
+AND
+GlobalGetFlag("LLFULOOT_SettingsBookAdded", 0)
+THEN
+TimerLaunch("LLFULOOT_Timers_Editor_AddSettingsBook", 250);
+
+IF
+TimerFinished("LLFULOOT_Timers_Editor_AddSettingsBook")
+AND
+GlobalGetFlag("LLFULOOT_SettingsBookAdded", 0)
+AND
+CharacterGetHostCharacter(_Host)
+AND
+ItemTemplateIsInPartyInventory(_Host, "BOOK_LLFULOOT_SettingsMenu_7056c5bd-5d3a-44c3-8511-df02f6464ccf", 0, 0)
+THEN
+GlobalSetFlag("LLFULOOT_SettingsBookAdded");
+ItemTemplateAddTo("BOOK_LLFULOOT_SettingsMenu_7056c5bd-5d3a-44c3-8511-df02f6464ccf", _Host, 1, 0);
+
+IF
+CharacterUsedItemTemplate(_Player, "BOOK_LLFULOOT_SettingsMenu_7056c5bd-5d3a-44c3-8511-df02f6464ccf", _Book)
+AND
+QRY_SpeakerIsAvailable(_Player)
+THEN
+//Inventory lock workaround?
+ProcObjectTimer(_Player, "LLFULOOT_Timers_OpenSettingsMenu", 100);
+
+PROC
+ProcObjectTimerFinished(_Player, "LLFULOOT_Timers_OpenSettingsMenu")
+AND
+QRY_SpeakerIsAvailable(_Player)
+THEN
+Proc_StartDialog(0, "LLFULOOT_SettingsMenu", _Player, _Player);
+
+IF
+TextEventSet("llfuloot_settings")
+AND
+CharacterGetHostCharacter(_Host)
+AND
+QRY_SpeakerIsAvailable(_Host)
+THEN
+Proc_StartDialog(0, "LLFULOOT_SettingsMenu", _Host, _Host);
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "LaughingLeader_FullLoot"

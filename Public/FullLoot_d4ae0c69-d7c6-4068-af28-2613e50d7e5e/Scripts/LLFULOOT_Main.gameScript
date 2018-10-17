@@ -1,0 +1,20 @@
+INIT
+
+
+EVENTS
+
+EVENT LLFULOOT_AdjustGold
+VARS
+	ITEM:_Gold
+	FLOAT:_AmountF
+	INT:_Amount
+ON
+	OnItemEvent(_Gold, "LLFULOOT_AdjustGold")
+ACTIONS
+IF "c1"
+	ItemGetStat(_AmountF, _Gold, Value)
+THEN
+	Multiply(_AmountF, 0.25)
+	Cast(_Amount, _AmountF)
+	ItemSetAmount(_Gold, _Amount)
+ENDIF

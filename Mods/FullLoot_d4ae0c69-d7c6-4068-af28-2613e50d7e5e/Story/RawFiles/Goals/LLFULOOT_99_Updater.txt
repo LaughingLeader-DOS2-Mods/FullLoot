@@ -1,0 +1,77 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+LLFULOOT_Internal_RegisterMod();
+KBSECTION
+
+//REGION VERSIONING
+IF
+GameStarted(_Level, _)
+AND
+IsGameLevel(_Level, 1)
+AND
+LLFULOOT_Updater_QRY_UpdateNeeded("1.0.0.0")
+THEN
+LLFULOOT_Internal_RegisterMod();
+
+PROC
+LLFULOOT_Internal_RegisterMod()
+THEN
+LLFULOOT_Updater_RemoveOldVersions("1.0.0.0");
+LLFULOOT_Updater_SetVersion("1.0.0.0");
+
+QRY
+LLFULOOT_Updater_QRY_UpdateNeeded((STRING)_Version)
+AND
+NOT DB_Mods_Registered("FullLoot", "LaughingLeader", _Version)
+THEN
+DB_NOOP(1);
+
+PROC
+LLFULOOT_Updater_RemoveOldVersions((STRING)_NextVersion)
+AND
+DB_Mods_Registered("FullLoot", "LaughingLeader", _Version)
+THEN
+NOT DB_Mods_Registered("FullLoot", "LaughingLeader", _Version);
+LLFULOOT_Updater_VersionUpdated(_Version, _NextVersion);
+
+PROC
+LLFULOOT_Updater_VersionUpdated((STRING)_Version, (STRING)_NextVersion)
+THEN
+DB_NOOP(1);
+
+PROC
+LLFULOOT_Updater_SetVersion((STRING)_Version)
+AND
+GlobalGetFlag("LeaderLib_Initialized", 1)
+THEN
+//Fire LeaderLib ModUpdated procs.
+DB_LeaderLib_ModApi_RegisterMod("FullLoot", "LaughingLeader", _Version);
+
+PROC
+LLFULOOT_Updater_SetVersion((STRING)_Version)
+AND
+NOT GlobalGetFlag("LeaderLib_Initialized", 1)
+THEN
+DB_Mods_Registered("FullLoot", "LaughingLeader", _Version);
+//END_REGION
+
+//REGION LeaderLib
+IF
+StoryEvent(_, "LeaderLib_Initialized")
+AND
+NOT DB_LLFULOOT_RegisteredLeaderLibSettings(_)
+THEN
+DB_LLFULOOT_RegisteredLeaderLibSettings(1);
+
+IF
+DB_LLFULOOT_RegisteredLeaderLibSettings(1)
+THEN
+DB_LeaderLib_ModApi_RegisterActiveGoal("FullLoot", "LaughingLeader", "LLFULOOT_99_Updater");
+DB_LeaderLib_ModApi_RegisterMenu("LaughingLeader.FullLoot", "[Full Loot] Settings", "LLFULOOT_SettingsMenu", "FullLoot", "LaughingLeader");
+//END_REGION
+
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "LaughingLeader_FullLoot"

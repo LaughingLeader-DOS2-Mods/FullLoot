@@ -1,0 +1,35 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+LLFULOOT_Internal_CompleteIfStarted(); // Existing saves
+KBSECTION
+PROC
+LLFULOOT_Internal_Start()
+THEN
+DebugBreak("[LLFullLoot] Starting Full Loot.");
+GoalCompleted;
+
+IF
+GameEventSet("GAMEEVENT_GameStarted")
+THEN
+LLFULOOT_Internal_Start();
+
+PROC
+LLFULOOT_Internal_CompleteIfStarted()
+AND
+DB_StoryStarted(_)
+THEN
+DebugBreak("[LLFullLoot:CompleteIfStarted] Full Loot was added to an existing save.");
+LLFULOOT_Internal_Start();
+
+// For saves where this goal is active, but wasn't completed
+IF
+SavegameLoaded(_,_,_,_)
+AND
+DB_StoryStarted(_)
+THEN
+DebugBreak("[LLFullLoot:SavegameLoaded] Full Loot was added to an existing save.");
+LLFULOOT_Internal_Start();
+EXITSECTION
+
+ENDEXITSECTION

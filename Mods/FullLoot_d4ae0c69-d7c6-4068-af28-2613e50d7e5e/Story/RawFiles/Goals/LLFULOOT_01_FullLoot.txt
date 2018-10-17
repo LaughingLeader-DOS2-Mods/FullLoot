@@ -1,0 +1,190 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+
+KBSECTION
+IF
+TradeGenerationEnded(_Trader)
+AND
+ObjectGetFlag(_Trader, "LLFULOOT_GeneratedTradeTreasure", 0)
+THEN
+ObjectSetFlag(_Trader, "LLFULOOT_GeneratedTradeTreasure");
+
+QRY
+LLFULOOT_QRY_CanFullyLoot((CHARACTERGUID)_Character)
+AND
+NOT DB_IsStoryNpc(_Character)
+AND
+CharacterIsPlayer(_Character, 0)
+AND
+CharacterIsSummon(_Character, 0)
+THEN
+DB_NOOP(1);
+
+IF
+CharacterStatusAttempt(_Character, "DYING", _)
+AND
+CharacterCanTrade(_Character, 1)
+AND
+LLFULOOT_QRY_CanFullyLoot(_Character)
+AND
+ObjectGetFlag(_Character, "LLFULOOT_GeneratedTradeTreasure", 0)
+AND
+CharacterGetHostCharacter(_Host)
+THEN
+ObjectSetFlag(_Character, "LLFULOOT_GeneratedTradeTreasure");
+GenerateItems(_Host, _Character);
+DebugBreak("[LLFULOOT:CharacterStatusAttempt(DYING)] Trader never generated items. Forced a trade generation.");
+
+IF
+CharacterStatusAttempt(_Character, "DYING", _)
+AND
+DB_GlobalFlag("LLFULOOT_AdjustGoldAmounts")
+AND
+CharacterCanTrade(_Character, 1)
+AND
+LLFULOOT_QRY_CanFullyLoot(_Character)
+THEN
+LLFULOOT_StoreGoldAmount(_Character);
+
+IF
+CharacterStatusAttempt(_Character, "DYING", _)
+AND
+LLFULOOT_QRY_CanFullyLoot(_Character)
+AND
+GlobalGetFlag("LLFULOOT_EquippedArmorLootable", _Armor)
+AND
+GlobalGetFlag("LLFULOOT_EquippedWeaponsLootable", _Weapons)
+AND
+GetPosition(_Character, _x, _y, _z)
+AND
+CreateItemTemplateAtPosition("S_LLFULOOT_InvisibleBackpack_394d4e05-b258-4b3f-a78b-eff97a25b231", _x, _y, _z, _Backpack)
+THEN
+MoveAllItemsTo(_Character, _Backpack, _Armor, _Weapons, 0);
+DebugBreak("[LLFULOOT:CharacterStatusAttempt(DYING)] Moved all items to a backpack.");
+DB_LLFULOOT_Temp_TraderBackpack(_Character, _Backpack);
+
+QRY
+LLFULOOT_QRY_EitherCharacterIsAPlayer((CHARACTERGUID)_Owner, (CHARACTERGUID)_Attacker)
+AND
+CharacterIsPlayer(_Owner, 1)
+THEN
+DB_NOOP(1);
+
+QRY
+LLFULOOT_QRY_EitherCharacterIsAPlayer((CHARACTERGUID)_Owner, (CHARACTERGUID)_Attacker)
+AND
+CharacterIsPlayer(_Attacker, 1)
+THEN
+DB_NOOP(1);
+
+IF
+CharacterKilledBy(_Character, _Owner, _Attacker)
+AND
+GlobalGetFlag("LLFULOOT_PVPLootEnabled", 1)
+AND
+CharacterIsPlayer(_Character, 1)
+AND
+CharacterIsSummon(_Character, 0)
+AND
+LLFULOOT_QRY_EitherCharacterIsAPlayer(_Owner, _Attacker)
+AND
+CharacterIsInPartyWith(_Character, _Owner, 0)
+THEN
+CharacterSetCorpseLootable(_Character, 1);
+DebugBreak("[LLFULOOT:CharacterKilledBy] [PVP Loot] Player killed by another player from a different party. Made corpse lootable.");
+
+IF
+CharacterDied(_Character)
+AND
+DB_LLFULOOT_Temp_TraderBackpack(_Character, _Backpack)
+THEN
+NOT DB_LLFULOOT_Temp_TraderBackpack(_Character, _Backpack);
+MoveAllItemsTo(_Backpack, _Character, 1, 1, 0);
+ItemRemove(_Backpack);
+CharacterSetCorpseLootable(_Character, 1);
+DebugBreak("[LLFULOOT:CharacterDied] Moved all items back to character.");
+SetStoryEvent(_Character, "LLFULOOT_LootSet");
+
+IF
+CharacterStatusRemoved(_Character, "DYING", _)
+AND
+CharacterIsDead(_Character, 0)
+AND
+DB_LLFULOOT_Temp_TraderBackpack(_Character, _Backpack)
+THEN
+DebugBreak("[LLFULOOT:CharacterStatusRemoved(DYING)] Character didn't die. Moving items back and removing backpack.");
+NOT DB_LLFULOOT_Temp_TraderBackpack(_Character, _Backpack);
+MoveAllItemsTo(_Backpack, _Character, 1, 1, 0);
+ItemRemove(_Backpack);
+SetStoryEvent(_Character, "LLFULOOT_FullLootCancelled");
+
+IF
+StoryEvent((CHARACTERGUID)_Character, "LLFULOOT_FullLootCancelled")
+AND
+DB_LLFULOOT_Temp_GoldAmount(_Character, _SetAmount)
+THEN
+NOT DB_LLFULOOT_Temp_GoldAmount(_Character, _SetAmount);
+
+IF
+StoryEvent((CHARACTERGUID)_Character, "LLFULOOT_LootSet")
+AND
+DB_LLFULOOT_Temp_GoldAmount(_Character, _SetAmount)
+THEN
+LLFULOOT_RemoveGold(_Character);
+ProcObjectTimer(_Character, "LLFULOOT_Timers_AdjustGold", 250);
+
+PROC
+LLFULOOT_StoreGoldAmount((CHARACTERGUID)_Character)
+AND
+NOT DB_LLFULOOT_Temp_GoldAmount(_Character, _)
+AND
+ObjectGetFlag(_Character, "LLFULOOT_GeneratedTradeTreasure", 1)
+AND
+GlobalGetFlag("LLFULOOT_AdjustGoldAmounts", 1)
+AND
+CharacterGetGold(_Character, _GoldAmount)
+AND
+IntegerDivide(_GoldAmount, 4, _SetAmount)
+THEN
+DB_LLFULOOT_Temp_GoldAmount(_Character, _SetAmount);
+
+PROC
+LLFULOOT_RemoveGold((CHARACTERGUID)_Character)
+AND
+GetItemForItemTemplateInInventory(_Character, "LOOT_Gold_A_1c3c9c74-34a1-4685-989e-410dc080be6f", _Gold)
+THEN
+ItemRemove(_Gold);
+DebugBreak("[LLFULOOT:RemoveGold] Removed gold root template from character.");
+
+/*
+PROC
+LLFULOOT_RemoveGold((CHARACTERGUID)_Character)
+AND
+GetItemForItemTemplateInInventory(_Character, "1c3c9c74-34a1-4685-989e-410dc080be6f", _Gold)
+THEN
+ItemRemove(_Gold);
+DebugBreak("[LLFULOOT:RemoveGold] Removed gold from character.");
+*/
+
+PROC
+ProcObjectTimerFinished((CHARACTERGUID)_Character, "LLFULOOT_Timers_AdjustGold")
+AND
+DB_LLFULOOT_Temp_GoldAmount(_Character, _SetAmount)
+THEN
+NOT DB_LLFULOOT_Temp_GoldAmount(_Character, _SetAmount);
+CharacterAddGold(_Character, _SetAmount);
+DebugBreak("[LLFULOOT:AdjustGold] Added 1/4 of previous gold to character.");
+
+//REGION DEBUG
+IF
+GameStarted(_, 1)
+THEN
+GlobalSetFlag("LLFULOOT_AdjustGoldAmounts");
+GlobalSetFlag("LLFULOOT_EquippedArmorLootable");
+GlobalSetFlag("LLFULOOT_EquippedWeaponsLootable");
+//END_REGION
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "LaughingLeader_FullLoot"
