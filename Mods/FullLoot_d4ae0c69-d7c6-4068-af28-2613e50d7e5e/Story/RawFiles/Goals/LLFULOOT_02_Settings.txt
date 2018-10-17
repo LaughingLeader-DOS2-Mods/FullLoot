@@ -54,6 +54,9 @@ ItemTemplateIsInPartyInventory(_Host, "BOOK_LLFULOOT_SettingsMenu_7056c5bd-5d3a-
 THEN
 GlobalSetFlag("LLFULOOT_SettingsBookAdded");
 ItemTemplateAddTo("BOOK_LLFULOOT_SettingsMenu_7056c5bd-5d3a-44c3-8511-df02f6464ccf", _Host, 1, 0);
+//Initial settings
+GlobalSetFlag("LLFULOOT_AdjustGoldAmounts");
+GlobalSetFlag("LLFULOOT_GoldReduction_Fourth");
 
 IF
 GameStarted(_, 1)

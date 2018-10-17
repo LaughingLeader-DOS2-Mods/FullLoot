@@ -141,11 +141,26 @@ NOT DB_LLFULOOT_Temp_GoldAmount(_Character, _)
 AND
 ObjectGetFlag(_Character, "LLFULOOT_GeneratedTradeTreasure", 1)
 AND
-GlobalGetFlag("LLFULOOT_AdjustGoldAmounts", 1)
+DB_GlobalFlag("LLFULOOT_GoldReduction_Fourth")
 AND
 CharacterGetGold(_Character, _GoldAmount)
 AND
 IntegerDivide(_GoldAmount, 4, _SetAmount)
+THEN
+DB_LLFULOOT_Temp_GoldAmount(_Character, _SetAmount);
+
+PROC
+LLFULOOT_StoreGoldAmount((CHARACTERGUID)_Character)
+AND
+NOT DB_LLFULOOT_Temp_GoldAmount(_Character, _)
+AND
+ObjectGetFlag(_Character, "LLFULOOT_GeneratedTradeTreasure", 1)
+AND
+DB_GlobalFlag("LLFULOOT_GoldReduction_Half")
+AND
+CharacterGetGold(_Character, _GoldAmount)
+AND
+IntegerDivide(_GoldAmount, 2, _SetAmount)
 THEN
 DB_LLFULOOT_Temp_GoldAmount(_Character, _SetAmount);
 
@@ -174,13 +189,14 @@ DB_LLFULOOT_Temp_GoldAmount(_Character, _SetAmount)
 THEN
 NOT DB_LLFULOOT_Temp_GoldAmount(_Character, _SetAmount);
 CharacterAddGold(_Character, _SetAmount);
-DebugBreak("[LLFULOOT:AdjustGold] Added 1/4 of previous gold to character.");
+DebugBreak("[LLFULOOT:AdjustGold] Added a reduced amount of previous gold to trader.");
 
 //REGION DEBUG
 IF
 GameStarted(_, 1)
 THEN
 GlobalSetFlag("LLFULOOT_AdjustGoldAmounts");
+GlobalSetFlag("LLFULOOT_GoldReduction_Fourth");
 GlobalSetFlag("LLFULOOT_EquippedArmorLootable");
 GlobalSetFlag("LLFULOOT_EquippedWeaponsLootable");
 //END_REGION
