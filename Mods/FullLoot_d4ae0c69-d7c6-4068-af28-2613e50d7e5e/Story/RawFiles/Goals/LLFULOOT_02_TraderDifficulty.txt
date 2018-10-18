@@ -4,6 +4,7 @@ INITSECTION
 LLFULOOT_Trader_InitSettings();
 
 KBSECTION
+//REGION SETTINGS
 PROC
 LLFULOOT_Trader_InitSettings()
 THEN
@@ -38,22 +39,55 @@ DB_LLFULOOT_Trader_GuardPresets(10, "Shadowblade");
 DB_LLFULOOT_Trader_GuardPresets(11, "Wayfarer");
 DB_LLFULOOT_Trader_GuardPresets(12, "Witch");
 DB_LLFULOOT_Trader_GuardPresets(13, "Wizard");
+//END_REGION
 
-DB_LLFULOOT_Trader_GuardPresets2(0, "Battlemage_Act2");
-DB_LLFULOOT_Trader_GuardPresets2(1, "Cleric_Act2");
-DB_LLFULOOT_Trader_GuardPresets2(2, "Conjurer_Act2");
-DB_LLFULOOT_Trader_GuardPresets2(3, "Enchanter_Act2");
-DB_LLFULOOT_Trader_GuardPresets2(4, "Fighter_Act2");
-DB_LLFULOOT_Trader_GuardPresets2(5, "Inquisitor_Act2");
-DB_LLFULOOT_Trader_GuardPresets2(6, "Knight_Act2");
-DB_LLFULOOT_Trader_GuardPresets2(7, "Metamorph_Act2");
-DB_LLFULOOT_Trader_GuardPresets2(8, "Ranger_Act2");
-DB_LLFULOOT_Trader_GuardPresets2(9, "Rogue_Act2");
-DB_LLFULOOT_Trader_GuardPresets2(10, "Shadowblade_Act2");
-DB_LLFULOOT_Trader_GuardPresets2(11, "Wayfarer_Act2");
-DB_LLFULOOT_Trader_GuardPresets2(12, "Witch_Act2");
-DB_LLFULOOT_Trader_GuardPresets2(13, "Wizard_Act2");
+//REGION QUERIES
+//Only spawn bodyguards when there's something worth protecting
+QRY
+LLFULOOT_QRY_Trader_IsValuableTrader((CHARACTERGUID)_Trader, (INTEGER)_MinValue)
+AND
+CharacterCanTrade(_Trader, 1)
+AND
+LLFULOOT_QRY_CanFullyLoot(_Trader)
+AND
+LLFULOOT_QRY_Trader_GoldValueMeetsMinimum(_Trader, _MinValue)
+THEN
+DB_NOOP(1);
 
+QRY
+LLFULOOT_QRY_Trader_GoldValueMeetsMinimum((CHARACTERGUID)_Trader, (INTEGER)_MinValue)
+AND
+CharacterGetGold(_Trader, _Value)
+AND
+_Value >= _MinValue
+THEN
+DB_NOOP(1);
+
+QRY
+LLFULOOT_QRY_Trader_GoldValueMeetsMinimum((CHARACTERGUID)_Trader, (INTEGER)_MinValue)
+AND
+CharacterGetInventoryGoldValue(_Trader, _Value)
+AND
+_Value >= _MinValue
+THEN
+DB_NOOP(1);
+
+QRY
+LLFULLOOT_Trader_QRY_IsUndead((CHARACTERGUID)_Trader)
+AND
+IsTagged(_Trader, "UNDEAD", 1)
+THEN
+DB_NOOP(1);
+
+QRY
+LLFULLOOT_Trader_QRY_IsUndead((CHARACTERGUID)_Trader)
+AND
+IsTagged(_Trader, "UNDEAD_BEAST", 1)
+THEN
+DB_NOOP(1);
+//END_REGION
+
+//REGION BEEF_MODE
 IF
 ObjectEnteredCombat((CHARACTERGUID)_Trader, _CombatID)
 AND
@@ -61,9 +95,7 @@ DB_GlobalFlag("LLFULOOT_TraderDifficulty_Enabled")
 AND
 DB_GlobalFlag("LLFULOOT_TraderDifficulty_StrongerTraders")
 AND
-CharacterCanTrade(_Trader, 1)
-AND
-LLFULOOT_QRY_CanFullyLoot(_Trader)
+LLFULOOT_QRY_Trader_IsValuableTrader(_Trader, 250)
 AND
 ObjectGetFlag(_Trader, "LLFULOOT_BeefModeEngaged", 0)
 AND
@@ -93,17 +125,57 @@ ObjectGetFlag(_Trader, "LLFULOOT_BeefModeEngaged", 1)
 THEN
 ObjectClearFlag(_Trader, "LLFULOOT_BeefModeEngaged");
 RemoveStatus(_Trader, "LLFULOOT_TRADER_BEEF_MODE");
+//END_REGION
 
+//REGION TRADER_VALUE
+IF
+ObjectEnteredCombat((CHARACTERGUID)_Trader, _CombatID)
+AND
+CharacterCanTrade(_Trader, 1)
+AND
+ObjectGetFlag(_Trader, "LLFULOOT_GeneratedTradeTreasure", 0)
+AND
+CharacterGetHostCharacter(_Player)
+THEN
+LLFULOOT_Trader_InitializeInventoryValue(_Trader, _Player);
+
+IF
+AttackedByObject((CHARACTERGUID)_Trader, (CHARACTERGUID)_Player, _, _, _)
+AND
+ObjectGetFlag(_Trader, "LLFULOOT_GeneratedTradeTreasure", 0)
+AND
+CharacterIsPlayer(_Player, 1)
+AND
+CharacterCanTrade(_Trader, 1)
+THEN
+LLFULOOT_Trader_InitializeInventoryValue(_Trader, _Player);
+
+//Since trade items may not be generated yet, force a generation so we can determine the trader's value
+PROC
+LLFULOOT_Trader_InitializeInventoryValue((CHARACTERGUID)_Trader, (CHARACTERGUID)_Player)
+AND
+DB_GlobalFlag("LLFULOOT_TraderDifficulty_Enabled")
+AND
+ObjectGetFlag(_Trader, "LLFULOOT_GeneratedTradeTreasure", 0)
+AND
+CharacterGetInventoryGoldValue(_Trader, _Value)
+AND
+_Value <= 100
+THEN
+GenerateItems(_Player, _Trader);
+//END_REGION
+
+//REGION BODYGUARD_SPAWNING
 IF
 AttackedByObject((CHARACTERGUID)_Trader, (CHARACTERGUID)_Player, _, _, _)
 AND
 ObjectGetFlag(_Trader, "LLFULOOT_SpawnedGuards", 0)
 AND
+ObjectGetFlag(_Trader, "LLFULOOT_CanSpawnGuards", 0)
+AND
 CharacterIsPlayer(_Player, 1)
 AND
-CharacterCanTrade(_Trader, 1)
-AND
-LLFULOOT_QRY_CanFullyLoot(_Trader)
+LLFULOOT_QRY_Trader_IsValuableTrader(_Trader, 1000)
 THEN
 ObjectSetFlag(_Trader, "LLFULOOT_CanSpawnGuards");
 
@@ -117,27 +189,39 @@ THEN
 ObjectClearFlag(_Trader, "LLFULOOT_CanSpawnGuards");
 
 IF
+ObjectFlagSet("LLFULOOT_CanSpawnGuards", (CHARACTERGUID)_Trader, _)
+AND
+ObjectGetFlag(_Trader, "LLFULOOT_SpawnedGuards", 0)
+AND
+CharacterIsInCombat(_Trader, 1)
+THEN
+LLFULOOT_Trader_Internal_GuardSpawnCheck(_Trader);
+
+IF
 ObjectEnteredCombat((CHARACTERGUID)_Trader, _CombatID)
+AND
+ObjectGetFlag(_Trader, "LLFULOOT_CanSpawnGuards", 1) // Only traders attacked by players
+AND
+ObjectGetFlag(_Trader, "LLFULOOT_SpawnedGuards", 0)
+THEN
+LLFULOOT_Trader_Internal_GuardSpawnCheck(_Trader);
+
+PROC
+LLFULOOT_Trader_Internal_GuardSpawnCheck((CHARACTERGUID)_Trader)
 AND
 DB_GlobalFlag("LLFULOOT_TraderDifficulty_Enabled")
 AND
 DB_GlobalFlag("LLFULOOT_TraderDifficulty_SpawnGuards")
 AND
-ObjectGetFlag(_Trader, "LLFULOOT_CanSpawnGuards", 1) // Only traders attacked by players
-AND
-CharacterCanTrade(_Trader, 1)
-AND
-LLFULOOT_QRY_CanFullyLoot(_Trader)
-AND
-ObjectGetFlag(_Trader, "LLFULOOT_SpawnedGuards", 0)
+CombatGetIDForCharacter(_Trader, _CombatID)
 AND
 CombatGetInvolvedPlayer(_CombatID, 1, _Player)
 AND
 CharacterIsEnemy(_Player, _Trader, 1)
 THEN
-DebugBreak("[LLFULOOT:Trader:ObjectEnteredCombat] Spawning trader guards.");
+DebugBreak("[LLFULOOT:Trader:ObjectFlagSet(LLFULOOT_CanSpawnGuards)] Spawning trader guards.");
 ObjectSetFlag(_Trader, "LLFULOOT_SpawnedGuards");
-ObjectClearFlag(_Trader, "LLFULOOT_CanSpawnGuards", 1);
+ObjectClearFlag(_Trader, "LLFULOOT_CanSpawnGuards");
 LLFULOOT_Trader_Internal_StartSpawningGuards(_Trader, _Player, _CombatID);
 
 PROC
@@ -155,15 +239,15 @@ IntegerDivide(_IntA, 1000, _IntB)
 AND
 IntegerSum(_IntB, 1, _IntC)
 AND
-IntegerMax(_IntC, 3, _Max)
+IntegerMin(_IntC, 4, _Max)
 AND
 Random(99999, _Ran)
 AND
-IntegerModulo(_Ran, _Max, _IntD)
+IntegerModulo(_Ran, _Max, _RanAmount)
 AND
-IntegerMax(_IntC, 1, _GuardAmount)
+IntegerMax(_RanAmount, 1, _GuardAmount)
 AND
-IntegertoString(1, _AmountStr)
+IntegertoString(_GuardAmount, _AmountStr)
 AND
 StringConcatenate("[LLFULOOT:Trader:SpawnGuards] Spawning [", _AmountStr, _Str1)
 AND
@@ -192,6 +276,7 @@ CharacterGetRace(_Trader, 0, _Race)
 AND
 _Race != ""
 THEN
+DebugBreak(_Race);
 DB_LLFULOOT_Trader_Temp_TraderRace(_Trader, _Race);
 
 PROC
@@ -210,20 +295,6 @@ AND
 StringContains(_Template, _Race, 1)
 THEN
 DB_LLFULOOT_Trader_Temp_TraderRace(_Trader, _Race);
-
-QRY
-LLFULLOOT_Trader_QRY_IsUndead((CHARACTERGUID)_Trader)
-AND
-IsTagged(_Trader, "UNDEAD", 1)
-THEN
-DB_NOOP(1);
-
-QRY
-LLFULLOOT_Trader_QRY_IsUndead((CHARACTERGUID)_Trader)
-AND
-IsTagged(_Trader, "UNDEAD_BEAST", 1)
-THEN
-DB_NOOP(1);
 
 PROC
 LLFULLOOT_Trader_RecordTraderRace((CHARACTERGUID)_Trader)
@@ -395,6 +466,7 @@ CharacterLevelUpTo(_Guard, _Level);
 
 SetTag(_Guard, "LLFULOOT_TraderGuard");
 SetTag(_Guard, "GUARD");
+DB_LLFULLOOT_Trader_Bodyguards(_Trader, _Guard);
 TeleportTo(_Guard, _Trader, "LLFULOOT_GuardAppeared", 0, 0);
 LLFULOOT_Trader_Internal_SpawnNextGuard(_Trader);
 
@@ -474,6 +546,161 @@ AND
 IsTagged(_Guard, "LLFULOOT_TraderGuard", 1)
 THEN
 Poof(_Guard);
+RemoveTemporaryCharacter(_Guard);
+//END_REGION
+
+//REGION BODYGUARD_INVESTIGATE
+IF
+CharacterKilledBy(_Trader, _Player, _)
+AND
+CharacterIsPlayer(_Player, 1)
+AND
+DB_LLFULLOOT_Trader_Bodyguards(_Trader, _Guard)
+AND
+CharacterIsInCombat(_Guard, 0)
+AND
+CharacterCanSee(_Guard, _Trader, 0)
+AND
+GetDistanceTo(_Guard, _Trader, _Dist)
+AND
+_Dist >= 10
+AND
+_Dist <= 60
+AND
+GetPosition(_Trader, _x, _y, _z)
+THEN
+DB_LLFULOOT_Trader_Temp_TraderMurderer(_Guard, _Trader, _Player);
+ProcCharacterMoveToPosition(_Guard, _x, _y, _z, 1, "LLFULOOT_BodyguardArrived");
+
+IF
+StoryEvent((CHARACTERGUID)_Guard, "LLFULOOT_BodyguardArrived")
+AND
+GetClosestAlivePlayer(_Guard, _Player, _Dist)
+AND
+CharacterCanSee(_Guard, _Player, 1)
+AND
+DB_LLFULOOT_Trader_Temp_TraderMurderer(_Guard, _Trader, _Murderer)
+AND
+CharacterIsInPartyWith(_Player, _Murderer, 1)
+THEN
+NOT DB_LLFULOOT_Trader_Temp_TraderMurderer(_Guard, _Trader, _Player);
+EnterCombat(_Guard, _Player);
+
+IF
+DB_LLFULOOT_Trader_Temp_TraderMurderer(_Guard, _Trader, _Murderer)
+THEN
+ProcObjectTimer(_Guard, "LLFULOOT_Timers_ClearBodyguardInvestigation", 120000); // 2 minutes
+
+PROC
+ProcObjectTimerFinished((CHARACTERGUID)_Guard, "LLFULOOT_Timers_ClearBodyguardInvestigation")
+AND
+DB_LLFULOOT_Trader_Temp_TraderMurderer(_Guard, _Trader, _Murderer)
+THEN
+NOT DB_LLFULOOT_Trader_Temp_TraderMurderer(_Guard, _Trader, _Murderer);
+
+IF
+ObjectEnteredCombat((CHARACTERGUID)_Guard, _CombatID)
+AND
+DB_LLFULOOT_Trader_Temp_TraderMurderer(_Guard, _Trader, _Murderer)
+AND
+DB_ObjectTimer(_Guard, _ObjectTimerName, "LLFULOOT_Timers_ClearBodyguardInvestigation")
+THEN
+ProcObjectTimerCancel(_Guard, "LLFULOOT_Timers_ClearBodyguardInvestigation");
+NOT DB_LLFULOOT_Trader_Temp_TraderMurderer(_Guard, _Trader, _Murderer);
+//END_REGION
+
+//REGION BODYGUARD_FOLLOWING
+IF
+ObjectLeftCombat((CHARACTERGUID)_Guard, _CombatID)
+AND
+DB_LLFULLOOT_Trader_Bodyguards(_Trader, _Guard)
+AND
+CharacterIsDead(_Trader, 0)
+AND
+CharacterIsInCombat(_Trader, 0)
+THEN
+ProcCharacterFollowCharacter(_Guard, _Trader);
+
+IF
+ObjectEnteredCombat((CHARACTERGUID)_Guard, _CombatID)
+AND
+DB_LLFULLOOT_Trader_Bodyguards(_Trader, _Guard)
+AND
+DB_Following(_Guard, _Trader)
+THEN
+ProcCharacterStopFollow(_Guard);
+//END_REGION
+
+//REGION BODYGUARD_RESET
+IF
+ObjectLeftCombat((CHARACTERGUID)_Trader, _CombatID)
+AND
+CharacterIsDead(_Trader, 0)
+AND
+ObjectGetFlag(_Trader, "LLFULOOT_SpawnedGuards", 1)
+THEN
+ProcObjectTimer(_Trader, "LLFULOOT_Timers_ResetBodyguards", 300000); // 5 minutes
+
+IF
+ObjectEnteredCombat((CHARACTERGUID)_Trader, _CombatID)
+AND
+DB_ObjectTimer(_Trader, _ObjectTimerName, "LLFULOOT_Timers_ResetBodyguards")
+AND
+DB_LLFULLOOT_Trader_Bodyguards(_Trader, _Guard)
+THEN
+PlayEffect(_Guard, "RS3_FX_GP_ScriptedEvent_Teleport_GenericSmoke_01");
+TeleportTo(_Guard, _Trader, "LLFULOOT_BodyguardArrivedAtTrader_Part2", 1, 0);
+
+IF
+StoryEvent((CHARACTERGUID)_Guard, "LLFULOOT_BodyguardArrivedAtTrader_Part2")
+AND
+DB_LLFULLOOT_Trader_Bodyguards(_Trader, _Guard)
+AND
+CombatGetIDForCharacter(_Trader, _CombatID)
+AND
+DB_CombatCharacters(_Character, _CombatID)
+AND
+CharacterIsInCombat(_Guard, 0)
+AND
+_Character != _Trader
+AND
+_Character != _Guard
+AND
+CharacterIsEnemy(_Trader, _Character, 1)
+THEN
+EnterCombat(_Guard, _Character);
+ProcObjectTimer(_Guard, "LLFULOOT_Timers_DisplayGuardText", 500);
+
+IF
+ObjectEnteredCombat((CHARACTERGUID)_Trader, _CombatID)
+AND
+DB_ObjectTimer(_Trader, _ObjectTimerName, "LLFULOOT_Timers_ResetBodyguards")
+THEN
+ProcObjectTimerCancel(_Trader, "LLFULOOT_Timers_ResetBodyguards");
+
+PROC
+ProcObjectTimerFinished((CHARACTERGUID)_Trader, "LLFULOOT_Timers_ResetBodyguards")
+AND
+DB_LLFULLOOT_Trader_Bodyguards(_Trader, _Guard)
+AND
+ObjectExists(_Guard, 1)
+AND
+CharacterIsInCombat(_Guard, 0)
+THEN
+Poof(_Guard);
+RemoveTemporaryCharacter(_Guard);
+NOT DB_LLFULLOOT_Trader_Bodyguards(_Trader, _Guard);
+
+PROC
+ProcObjectTimerFinished((CHARACTERGUID)_Trader, "LLFULOOT_Timers_ResetBodyguards")
+AND
+DB_LLFULLOOT_Trader_Bodyguards(_Trader, _Guard)
+AND
+ObjectExists(_Guard, 0)
+THEN
+NOT DB_LLFULLOOT_Trader_Bodyguards(_Trader, _Guard);
+//END_REGION
+
 EXITSECTION
 
 ENDEXITSECTION

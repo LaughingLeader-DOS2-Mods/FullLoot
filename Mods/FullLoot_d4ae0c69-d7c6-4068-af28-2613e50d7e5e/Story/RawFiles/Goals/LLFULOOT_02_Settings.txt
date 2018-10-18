@@ -3,7 +3,6 @@ SubGoalCombiner SGC_AND
 INITSECTION
 
 KBSECTION
-
 IF
 DialogStarted("LLFULOOT_SettingsMenu", _Instance)
 AND
@@ -102,6 +101,83 @@ THEN
 Proc_StartDialog(0, "LLFULOOT_SettingsMenu", _Host, _Host);
 
 IF
+GameStarted(_Region, _)
+AND
+IsGameLevel(_Region, 1)
+AND
+NOT DB_GlobalFlag("LLFULOOT_InitialSetupComplete")
+THEN
+TimerLaunch("LLFULOOT_Timers_StartSetupTimer", 1000);
+
+IF
+TimerFinished("LLFULOOT_Timers_StartSetupTimer")
+AND
+CharacterGetHostCharacter(_Host)
+AND
+QRY_SpeakerIsAvailable(_Host)
+THEN
+DB_LLFULOOT_Temp_SetupStarted(_Host);
+Proc_StartDialog(0, "LLFULOOT_Setup", _Host, _Host);
+
+//Speaker unavailable
+IF
+TimerFinished("LLFULOOT_Timers_StartSetupTimer")
+AND
+NOT DB_LLFULOOT_Temp_SetupStarted(_)
+THEN
+TimerLaunch("LLFULOOT_Timers_StartSetupTimer", 2000);
+
+IF
+DialogEnded("LLFULOOT_Setup", _)
+AND
+DB_LLFULOOT_Temp_SetupStarted(_Host)
+THEN
+NOT DB_LLFULOOT_Temp_SetupStarted(_Host);
+
+//REGION AUTOMATIC_GLOBAL_FLAGS
+IF
+GlobalFlagSet("LLFULOOT_GoldReduction_Fourth")
+AND
+NOT DB_GlobalFlag("LLFULOOT_AdjustGoldAmounts")
+THEN
+GlobalSetFlag("LLFULOOT_AdjustGoldAmounts");
+
+IF
+GlobalFlagSet("LLFULOOT_GoldReduction_Half")
+AND
+NOT DB_GlobalFlag("LLFULOOT_AdjustGoldAmounts")
+THEN
+GlobalSetFlag("LLFULOOT_AdjustGoldAmounts");
+
+IF
+GlobalFlagCleared("LLFULOOT_GoldReduction_Fourth")
+AND
+NOT DB_GlobalFlag("LLFULOOT_GoldReduction_Half")
+THEN
+GlobalClearFlag("LLFULOOT_AdjustGoldAmounts");
+
+IF
+GlobalFlagSet("LLFULOOT_GoldReduction_Half")
+AND
+NOT DB_GlobalFlag("LLFULOOT_GoldReduction_Fourth")
+THEN
+GlobalClearFlag("LLFULOOT_AdjustGoldAmounts");
+
+IF
+GlobalFlagSet("LLFULOOT_TraderDifficulty_StrongerTraders")
+AND
+NOT DB_GlobalFlag("LLFULOOT_TraderDifficulty_Enabled")
+THEN
+GlobalSetFlag("LLFULOOT_TraderDifficulty_Enabled");
+
+IF
+GlobalFlagSet("LLFULOOT_TraderDifficulty_SpawnGuards")
+AND
+NOT DB_GlobalFlag("LLFULOOT_TraderDifficulty_Enabled")
+THEN
+GlobalSetFlag("LLFULOOT_TraderDifficulty_Enabled");
+
+IF
 GlobalFlagCleared("LLFULOOT_TraderDifficulty_StrongerTraders")
 AND
 NOT DB_GlobalFlag("LLFULOOT_TraderDifficulty_SpawnGuards")
@@ -114,18 +190,18 @@ AND
 NOT DB_GlobalFlag("LLFULOOT_TraderDifficulty_StrongerTraders")
 THEN
 GlobalClearFlag("LLFULOOT_TraderDifficulty_Enabled");
+//END_REGION
 
 //REGION DEBUG
 IF
 GameStarted(_, 1)
 THEN
-GlobalSetFlag("LLFULOOT_AdjustGoldAmounts");
 GlobalSetFlag("LLFULOOT_GoldReduction_Fourth");
 GlobalSetFlag("LLFULOOT_EquippedArmorLootable");
 GlobalSetFlag("LLFULOOT_EquippedWeaponsLootable");
-GlobalSetFlag("LLFULOOT_TraderDifficulty_Enabled");
 GlobalSetFlag("LLFULOOT_TraderDifficulty_StrongerTraders");
 GlobalSetFlag("LLFULOOT_TraderDifficulty_SpawnGuards");
+GlobalSetFlag("LLFULOOT_InitialSetupComplete");
 
 IF
 GameStarted(_, 1)
@@ -138,6 +214,18 @@ IF
 GameStarted("_TMPL_Sandbox", 1)
 THEN
 CharacterLaunchIterator("LLFULOOT_LevelUpNPC");
+
+IF
+GameStarted("_TMPL_Sandbox", 1)
+AND
+NOT DB_GlobalFlag("LLFULOOT_InitialSetupComplete")
+THEN
+TimerLaunch("LLFULOOT_Timers_StartSetupTimer", 1000);
+
+IF
+GlobalFlagSet("LLFULOOT_InitialSetupComplete")
+THEN
+TimerCancel("LLFULOOT_Timers_StartSetupTimer");
 
 IF
 StoryEvent((CHARACTERGUID)_NPC, "LLFULOOT_LevelUpNPC")

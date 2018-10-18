@@ -164,6 +164,115 @@
                                                 "TagText" : {
                                                    "handle" : "ls::TranslatedStringRepository::s_HandleUnknown",
                                                    "type" : 28,
+                                                   "value" : "Setup complete."
+                                                },
+                                                "stub" : {"type" : 19, "value" : 1}
+                                             }
+                                          ]
+                                       }
+                                    ]
+                                 }
+                              ]
+                           }
+                        ],
+                        "Tags" : [ {} ],
+                        "UUID" : {"type" : 22, "value" : "0541f333-1254-4faa-b14a-d1b4e463b998"},
+                        "addressedspeaker" : {"type" : 4, "value" : -1},
+                        "checkflags" : [ {} ],
+                        "children" : [
+                           {
+                              "child" : [
+                                 {
+                                    "UUID" : {"type" : 22, "value" : "58eec3c2-fb49-4d47-83f7-3eb67ab76b01"}
+                                 }
+                              ]
+                           }
+                        ],
+                        "constructor" : {"type" : 22, "value" : "TagAnswer"},
+                        "editorData" : [
+                           {
+                              "data" : [
+                                 {
+                                    "key" : {"type" : 22, "value" : "ID"},
+                                    "val" : {"type" : 23, "value" : "N84"}
+                                 },
+                                 {
+                                    "key" : {"type" : 22, "value" : "NodeContext"},
+                                    "val" : {"type" : 23, "value" : ""}
+                                 },
+                                 {
+                                    "key" : {"type" : 22, "value" : "collapsed"},
+                                    "val" : {"type" : 23, "value" : "False"}
+                                 },
+                                 {
+                                    "key" : {"type" : 22, "value" : "logicalname"},
+                                    "val" : {"type" : 23, "value" : "Answer"}
+                                 },
+                                 {
+                                    "key" : {"type" : 22, "value" : "position"},
+                                    "val" : {"type" : 23, "value" : "975;672"}
+                                 },
+                                 {
+                                    "key" : {"type" : 22, "value" : "sourcetemplate"},
+                                    "val" : {"type" : 23, "value" : ""}
+                                 }
+                              ]
+                           }
+                        ],
+                        "endnode" : {"type" : 19, "value" : 0},
+                        "exclusive" : {"type" : 19, "value" : 0},
+                        "optional" : {"type" : 19, "value" : 0},
+                        "setflags" : [
+                           {
+                              "flaggroup" : [
+                                 {
+                                    "flag" : [
+                                       {
+                                          "name" : {"type" : 22, "value" : "LLFULOOT_SettingsActive"},
+                                          "paramval" : {"type" : 4, "value" : 1},
+                                          "value" : {"type" : 19, "value" : 0}
+                                       }
+                                    ],"type" : {"type" : 22, "value" : "Character"}}
+                              ]
+                           }
+                        ],
+                        "speaker" : {"type" : 4, "value" : 0},
+                        "stub" : {"type" : 19, "value" : 0},
+                        "transitionmode" : {"type" : 1, "value" : 2},
+                        "waittime" : {"type" : 6, "value" : -1.0}
+                     },
+                     {
+                        "GameData" : [
+                           {
+                              "AiPersonalities" : [ {} ],
+                              "CameraTarget" : {"type" : 4, "value" : -1},
+                              "CustomMovie" : {"type" : 23, "value" : ""},
+                              "Emotion" : {"type" : 23, "value" : "Default"},
+                              "ExtraWaitTime" : {"type" : 4, "value" : 0},
+                              "MusicInstrumentSounds" : [ {} ],
+                              "OriginSound" : [ {} ],
+                              "SoundEvent" : {"type" : 23, "value" : ""}
+                           }
+                        ],
+                        "ShowOnce" : {"type" : 19, "value" : 0},
+                        "TaggedTexts" : [
+                           {
+                              "TaggedText" : [
+                                 {
+                                    "HasTagRule" : {"type" : 19, "value" : 1},
+                                    "RuleGroup" : [
+                                       {
+                                          "Rules" : [ {} ],
+                                          "TagCombineOp" : {"type" : 1, "value" : 0}
+                                       }
+                                    ],
+                                    "TagTexts" : [
+                                       {
+                                          "TagText" : [
+                                             {
+                                                "TagText" : {
+                                                   "handle" : "ls::TranslatedStringRepository::s_HandleUnknown",
+                                                   "type" : 28,
                                                    "value" : "Disable More Difficult Traders - Traders will become the loot-filled, wet paper bags they used to be."
                                                 },
                                                 "stub" : {"type" : 19, "value" : 1}
@@ -306,6 +415,9 @@
                                  },
                                  {
                                     "UUID" : {"type" : 22, "value" : "ddef88d7-8b41-466f-8a24-bddd5a5c5407"}
+                                 },
+                                 {
+                                    "UUID" : {"type" : 22, "value" : "82e1c194-a3ff-4f9e-b990-e787004a47dd"}
                                  },
                                  {
                                     "UUID" : {"type" : 22, "value" : "35caad39-b64a-4c07-ab52-42b09ca5bbf3"}
@@ -1553,6 +1665,54 @@
                         "waittime" : {"type" : 6, "value" : -1.0}
                      },
                      {
+                        "DualDialog" : {"type" : 30, "value" : "LLFULOOT_Setup"},
+                        "Party" : {"type" : 19, "value" : 0},
+                        "ShowOnce" : {"type" : 19, "value" : 0},
+                        "Tags" : [ {} ],
+                        "UUID" : {"type" : 22, "value" : "76f3c234-568c-4592-b8f1-88c3afcf7878"},
+                        "children" : [
+                           {
+                              "child" : [
+                                 {
+                                    "UUID" : {"type" : 22, "value" : "0541f333-1254-4faa-b14a-d1b4e463b998"}
+                                 }
+                              ]
+                           }
+                        ],
+                        "constructor" : {"type" : 22, "value" : "DualDialog"},
+                        "editorData" : [
+                           {
+                              "data" : [
+                                 {
+                                    "key" : {"type" : 22, "value" : "ID"},
+                                    "val" : {"type" : 23, "value" : "N81"}
+                                 },
+                                 {
+                                    "key" : {"type" : 22, "value" : "collapsed"},
+                                    "val" : {"type" : 23, "value" : "False"}
+                                 },
+                                 {
+                                    "key" : {"type" : 22, "value" : "logicalname"},
+                                    "val" : {"type" : 23, "value" : "DualDialog"}
+                                 },
+                                 {
+                                    "key" : {"type" : 22, "value" : "position"},
+                                    "val" : {"type" : 23, "value" : "655;672"}
+                                 },
+                                 {
+                                    "key" : {"type" : 22, "value" : "sourcetemplate"},
+                                    "val" : {"type" : 23, "value" : ""}
+                                 }
+                              ]
+                           }
+                        ],
+                        "endnode" : {"type" : 19, "value" : 0},
+                        "exclusive" : {"type" : 19, "value" : 0},
+                        "optional" : {"type" : 19, "value" : 0},
+                        "transitionmode" : {"type" : 1, "value" : 1},
+                        "waittime" : {"type" : 6, "value" : 666.0}
+                     },
+                     {
                         "GameData" : [
                            {
                               "AiPersonalities" : [ {} ],
@@ -1786,6 +1946,133 @@
                         "jumptarget" : {"type" : 22, "value" : "147679f8-cf4e-4904-9b1d-a48de21a9b02"},
                         "jumptargetpoint" : {"type" : 1, "value" : 1},
                         "optional" : {"type" : 19, "value" : 0},
+                        "transitionmode" : {"type" : 1, "value" : 0},
+                        "waittime" : {"type" : 6, "value" : -1.0}
+                     },
+                     {
+                        "GameData" : [
+                           {
+                              "AiPersonalities" : [ {} ],
+                              "CameraTarget" : {"type" : 4, "value" : -1},
+                              "CustomMovie" : {"type" : 23, "value" : ""},
+                              "Emotion" : {"type" : 23, "value" : "Default"},
+                              "ExtraWaitTime" : {"type" : 4, "value" : 0},
+                              "MusicInstrumentSounds" : [ {} ],
+                              "OriginSound" : [ {} ],
+                              "SoundEvent" : {"type" : 23, "value" : ""}
+                           }
+                        ],
+                        "ShowOnce" : {"type" : 19, "value" : 0},
+                        "TaggedTexts" : [
+                           {
+                              "TaggedText" : [
+                                 {
+                                    "HasTagRule" : {"type" : 19, "value" : 1},
+                                    "RuleGroup" : [
+                                       {
+                                          "Rules" : [ {} ],
+                                          "TagCombineOp" : {"type" : 1, "value" : 0}
+                                       }
+                                    ],
+                                    "TagTexts" : [
+                                       {
+                                          "TagText" : [
+                                             {
+                                                "TagText" : {
+                                                   "handle" : "ls::TranslatedStringRepository::s_HandleUnknown",
+                                                   "type" : 28,
+                                                   "value" : "Setup Menu"
+                                                },
+                                                "stub" : {"type" : 19, "value" : 1}
+                                             }
+                                          ]
+                                       }
+                                    ]
+                                 }
+                              ]
+                           }
+                        ],
+                        "Tags" : [ {} ],
+                        "UUID" : {"type" : 22, "value" : "82e1c194-a3ff-4f9e-b990-e787004a47dd"},
+                        "addressedspeaker" : {"type" : 4, "value" : -1},
+                        "checkflags" : [
+                           {
+                              "flaggroup" : [
+                                 {
+                                    "flag" : [
+                                       {
+                                          "name" : {"type" : 22, "value" : "LLFULOOT_IsHost"},
+                                          "paramval" : {"type" : 4, "value" : 1},
+                                          "value" : {"type" : 19, "value" : 1}
+                                       },
+                                       {
+                                          "name" : {"type" : 22, "value" : "LLFULOOT_SetupActive"},
+                                          "paramval" : {"type" : 4, "value" : 1},
+                                          "value" : {"type" : 19, "value" : 0}
+                                       }
+                                    ],"type" : {"type" : 22, "value" : "Character"}}
+                              ]
+                           }
+                        ],
+                        "children" : [
+                           {
+                              "child" : [
+                                 {
+                                    "UUID" : {"type" : 22, "value" : "76f3c234-568c-4592-b8f1-88c3afcf7878"}
+                                 }
+                              ]
+                           }
+                        ],
+                        "constructor" : {"type" : 22, "value" : "TagQuestion"},
+                        "editorData" : [
+                           {
+                              "data" : [
+                                 {
+                                    "key" : {"type" : 22, "value" : "ID"},
+                                    "val" : {"type" : 23, "value" : "N79"}
+                                 },
+                                 {
+                                    "key" : {"type" : 22, "value" : "NodeContext"},
+                                    "val" : {"type" : 23, "value" : ""}
+                                 },
+                                 {
+                                    "key" : {"type" : 22, "value" : "collapsed"},
+                                    "val" : {"type" : 23, "value" : "False"}
+                                 },
+                                 {
+                                    "key" : {"type" : 22, "value" : "logicalname"},
+                                    "val" : {"type" : 23, "value" : "Question"}
+                                 },
+                                 {
+                                    "key" : {"type" : 22, "value" : "position"},
+                                    "val" : {"type" : 23, "value" : "335;672"}
+                                 },
+                                 {
+                                    "key" : {"type" : 22, "value" : "sourcetemplate"},
+                                    "val" : {"type" : 23, "value" : ""}
+                                 }
+                              ]
+                           }
+                        ],
+                        "endnode" : {"type" : 19, "value" : 0},
+                        "exclusive" : {"type" : 19, "value" : 0},
+                        "optional" : {"type" : 19, "value" : 0},
+                        "setflags" : [
+                           {
+                              "flaggroup" : [
+                                 {
+                                    "flag" : [
+                                       {
+                                          "name" : {"type" : 22, "value" : "LLFULOOT_SettingsActive"},
+                                          "paramval" : {"type" : 4, "value" : 1},
+                                          "value" : {"type" : 19, "value" : 1}
+                                       }
+                                    ],"type" : {"type" : 22, "value" : "Character"}}
+                              ]
+                           }
+                        ],
+                        "speaker" : {"type" : 4, "value" : 1},
+                        "stub" : {"type" : 19, "value" : 0},
                         "transitionmode" : {"type" : 1, "value" : 0},
                         "waittime" : {"type" : 6, "value" : -1.0}
                      },
@@ -2929,7 +3216,20 @@
                         "Tags" : [ {} ],
                         "UUID" : {"type" : 22, "value" : "ddef88d7-8b41-466f-8a24-bddd5a5c5407"},
                         "addressedspeaker" : {"type" : 4, "value" : -1},
-                        "checkflags" : [ {} ],
+                        "checkflags" : [
+                           {
+                              "flaggroup" : [
+                                 {
+                                    "flag" : [
+                                       {
+                                          "name" : {"type" : 22, "value" : "LLFULOOT_IsHost"},
+                                          "paramval" : {"type" : 4, "value" : 1},
+                                          "value" : {"type" : 19, "value" : 1}
+                                       }
+                                    ],"type" : {"type" : 22, "value" : "Character"}}
+                              ]
+                           }
+                        ],
                         "children" : [
                            {
                               "child" : [
@@ -3285,7 +3585,7 @@
          },
          "editorData" : {
             "needLayout" : {"type" : 19, "value" : 0},
-            "nextNodeId" : {"type" : 5, "value" : 73}
+            "nextNodeId" : {"type" : 5, "value" : 84}
          }
       }
    }
