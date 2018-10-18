@@ -141,7 +141,8 @@ THEN
 LLFULOOT_Trader_InitializeInventoryValue(_Trader, _Player);
 
 IF
-AttackedByObject((CHARACTERGUID)_Trader, (CHARACTERGUID)_Player, _, _, _)
+CharacterStartAttackObject((CHARACTERGUID)_Trader, (CHARACTERGUID)_Player, _)
+//AttackedByObject((CHARACTERGUID)_Trader, (CHARACTERGUID)_Player, _, _, _)
 AND
 ObjectGetFlag(_Trader, "LLFULOOT_GeneratedTradeTreasure", 0)
 AND
@@ -150,6 +151,19 @@ AND
 CharacterCanTrade(_Trader, 1)
 THEN
 LLFULOOT_Trader_InitializeInventoryValue(_Trader, _Player);
+
+PROC
+LLFULOOT_Trader_InitializeInventoryValue((CHARACTERGUID)_Trader, (CHARACTERGUID)_Player)
+AND
+DB_GlobalFlag("LLFULOOT_TraderDifficulty_Enabled")
+AND
+ObjectGetFlag(_Trader, "LLFULOOT_GeneratedTradeTreasure", 0)
+AND
+CharacterGetInventoryGoldValue(_Trader, _Value)
+AND
+_Value >= 1000
+THEN
+ObjectSetFlag(_Trader, "LLFULOOT_GeneratedTradeTreasure");
 
 //Since trade items may not be generated yet, force a generation so we can determine the trader's value
 PROC
@@ -161,9 +175,38 @@ ObjectGetFlag(_Trader, "LLFULOOT_GeneratedTradeTreasure", 0)
 AND
 CharacterGetInventoryGoldValue(_Trader, _Value)
 AND
-_Value <= 100
+_Value < 1000
+AND
+GetPosition(_Trader, _x, _y, _z)
+AND
+CreateItemTemplateAtPosition("S_LLFULOOT_InvisibleBackpack_394d4e05-b258-4b3f-a78b-eff97a25b231", _x, _y, _z, _Backpack)
 THEN
+DB_LLFULOOT_Trader_Temp_GeneratingItems(_Trader, _Player, _Backpack);
+MoveAllItemsTo(_Trader, _Backpack, 0, 0, 0);
+ProcObjectTimer(_Trader, "LLFULOOT_Timers_ItemsMoved_GenerateItems", 50);
+
+PROC
+ProcObjectTimerFinished((CHARACTERGUID)_Trader, "LLFULOOT_Timers_ItemsMoved_GenerateItems")
+AND
+DB_LLFULOOT_Trader_Temp_GeneratingItems(_Trader, _Player, _Backpack)
+THEN
+ObjectSetFlag(_Trader, "LLFULOOT_GeneratedTradeTreasure");
 GenerateItems(_Player, _Trader);
+ProcObjectTimer(_Trader, "LLFULOOT_Timers_GenerateItems_MoveItemsBack", 25);
+
+PROC
+ProcObjectTimerFinished((CHARACTERGUID)_Trader, "LLFULOOT_Timers_ItemsMoved_GenerateItems")
+AND
+DB_LLFULOOT_Trader_Temp_GeneratingItems(_Trader, _Player, _Backpack)
+THEN
+NOT DB_LLFULOOT_Trader_Temp_GeneratingItems(_Trader, _Player, _Backpack);
+MoveAllItemsTo(_Backpack, _Trader, 0, 0, 0);
+ProcObjectTimer(_Backpack, "LLFULOOT_Timers_DestroyInvisibleBackpack", 100);
+
+PROC
+ProcObjectTimerFinished((ITEMGUID)_Backpack, "LLFULOOT_Timers_DestroyInvisibleBackpack")
+THEN
+ItemRemove(_Backpack);
 //END_REGION
 
 //REGION BODYGUARD_SPAWNING
@@ -173,6 +216,8 @@ AND
 ObjectGetFlag(_Trader, "LLFULOOT_SpawnedGuards", 0)
 AND
 ObjectGetFlag(_Trader, "LLFULOOT_CanSpawnGuards", 0)
+AND
+CharacterIsDead(_Trader, 0)
 AND
 CharacterIsPlayer(_Player, 1)
 AND
@@ -213,6 +258,8 @@ AND
 DB_GlobalFlag("LLFULOOT_TraderDifficulty_Enabled")
 AND
 DB_GlobalFlag("LLFULOOT_TraderDifficulty_SpawnGuards")
+AND
+CharacterIsDead(_Trader, 0)
 AND
 CombatGetIDForCharacter(_Trader, _CombatID)
 AND

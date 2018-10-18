@@ -10,12 +10,21 @@ THEN
 DB_NOOP(1);
 //DB_LLFULOOT_TemplateBlacklist("EQ_Avatar_LLFULOOT_BeefPower_f26caedf-9509-4687-bcac-1f596060bf57");
 
+//REGION TRADE_TREASURE_FLAGS
 IF
 TradeGenerationEnded(_Trader)
 AND
 ObjectGetFlag(_Trader, "LLFULOOT_GeneratedTradeTreasure", 0)
 THEN
 ObjectSetFlag(_Trader, "LLFULOOT_GeneratedTradeTreasure");
+
+IF
+RequestTrade(_Player, _Trader)
+AND
+ObjectGetFlag(_Trader, "LLFULOOT_GeneratedTradeTreasure", 0)
+THEN
+ObjectSetFlag(_Trader, "LLFULOOT_GeneratedTradeTreasure");
+//END_REGION
 
 QRY
 LLFULOOT_QRY_CanFullyLoot((CHARACTERGUID)_Character)
@@ -39,10 +48,19 @@ LLFULOOT_QRY_CanFullyLoot(_Character)
 AND
 ObjectGetFlag(_Character, "LLFULOOT_GeneratedTradeTreasure", 0)
 AND
+NOT LLFULOOT_QRY_Trader_GoldValueMeetsMinimum(_Character, 2000) // Only generate if nothing of value is in their inventory
+AND
+GetPosition(_Character, _x, _y, _z)
+AND
 CharacterGetHostCharacter(_Host)
+AND
+CreateItemTemplateAtPosition("S_LLFULOOT_InvisibleBackpack_394d4e05-b258-4b3f-a78b-eff97a25b231", _x, _y, _z, _Backpack)
 THEN
 ObjectSetFlag(_Character, "LLFULOOT_GeneratedTradeTreasure");
+MoveAllItemsTo(_Character, _Backpack, 0, 0, 0);
 GenerateItems(_Host, _Character);
+MoveAllItemsTo(_Backpack, _Character, 0, 0, 0);
+ItemRemove(_Backpack);
 DebugBreak("[LLFULOOT:CharacterStatusAttempt(DYING)] Trader never generated items. Forced a trade generation.");
 
 IF
