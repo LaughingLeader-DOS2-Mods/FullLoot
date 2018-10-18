@@ -8,22 +8,23 @@ KBSECTION
 PROC
 LLFULOOT_Trader_InitSettings()
 THEN
-DB_LLFULOOT_Trader_RaceTemplates("Dwarf", 0,"Dwarves_Hero_Female_c1c58707-b06e-499e-9c43-91a90be602b0");
-DB_LLFULOOT_Trader_RaceTemplates("Dwarf", 1,"Dwarves_Hero_Male_024d1763-b2aa-46ec-b705-6338059838be");
-DB_LLFULOOT_Trader_RaceTemplates("Undead_Dwarf", 0,"Dwarves_Hero_Female_Undead_373a1966-a54d-4a3e-be70-e779a654c914");
-DB_LLFULOOT_Trader_RaceTemplates("Undead_Dwarf", 1,"Dwarves_Hero_Male_Undead_726442a5-6856-4b0d-91ed-5d2f003b8a0c");
-DB_LLFULOOT_Trader_RaceTemplates("Elf", 0,"Elves_Hero_Female_7ef846f5-34dc-450c-815e-a58dfc190a7b");
-DB_LLFULOOT_Trader_RaceTemplates("Elf", 1,"Elves_Hero_Male_19913083-924e-45ec-8b5b-119d5913722f");
-DB_LLFULOOT_Trader_RaceTemplates("Undead_Elf", 0,"Elves_Hero_Female_Undead_7f366172-9fd1-45df-8719-a6d14cb534b3");
-DB_LLFULOOT_Trader_RaceTemplates("Undead_Elf", 1,"Elves_Hero_Male_Undead_9eeaaafd-c47d-4650-9200-b00430d61e83");
-DB_LLFULOOT_Trader_RaceTemplates("Human", 0,"Humans_Hero_Female_de8ea39b-6989-4b93-b34a-81e549c540f2");
-DB_LLFULOOT_Trader_RaceTemplates("Human", 1,"Humans_Hero_Male_25611432-e5e4-482a-8f5d-196c9e90001e");
-DB_LLFULOOT_Trader_RaceTemplates("Undead_Human", 0,"Humans_Hero_Female_Undead_3bd0693d-0b0a-4f6d-93e2-aea9be654bee");
-DB_LLFULOOT_Trader_RaceTemplates("Undead_Human", 1,"Humans_Hero_Male_Undead_5ab5d036-4606-4265-962e-c2e4d2d2408b");
-DB_LLFULOOT_Trader_RaceTemplates("Lizard", 0,"Lizards_Hero_Female_e4a6bcfa-ecd6-4e56-8592-cd16b85a1c50");
-DB_LLFULOOT_Trader_RaceTemplates("Lizard", 1,"Lizards_Hero_Male_fa12e21f-0a10-47dd-af46-ab2c9a53cf6d");
-DB_LLFULOOT_Trader_RaceTemplates("Undead_Lizard", 0,"Lizards_Hero_Female_Undead_725f9a47-a3d4-41d2-92cf-017d18c2b212");
-DB_LLFULOOT_Trader_RaceTemplates("Undead_Lizard", 1,"Lizards_Hero_Male_Undead_57b70554-36bf-4b86-b9aa-8f7cc3944153");
+//Undead tags need to be checked first
+DB_LLFULOOT_Trader_RaceTemplates("UNDEAD_DWARF", 0,"Dwarves_Hero_Female_Undead_373a1966-a54d-4a3e-be70-e779a654c914");
+DB_LLFULOOT_Trader_RaceTemplates("UNDEAD_DWARF", 1,"Dwarves_Hero_Male_Undead_726442a5-6856-4b0d-91ed-5d2f003b8a0c");
+DB_LLFULOOT_Trader_RaceTemplates("UNDEAD_ELF", 0,"Elves_Hero_Female_Undead_7f366172-9fd1-45df-8719-a6d14cb534b3");
+DB_LLFULOOT_Trader_RaceTemplates("UNDEAD_ELF", 1,"Elves_Hero_Male_Undead_9eeaaafd-c47d-4650-9200-b00430d61e83");
+DB_LLFULOOT_Trader_RaceTemplates("UNDEAD_HUMAN", 0,"Humans_Hero_Female_Undead_3bd0693d-0b0a-4f6d-93e2-aea9be654bee");
+DB_LLFULOOT_Trader_RaceTemplates("UNDEAD_HUMAN", 1,"Humans_Hero_Male_Undead_5ab5d036-4606-4265-962e-c2e4d2d2408b");
+DB_LLFULOOT_Trader_RaceTemplates("UNDEAD_LIZARD", 0,"Lizards_Hero_Female_Undead_725f9a47-a3d4-41d2-92cf-017d18c2b212");
+DB_LLFULOOT_Trader_RaceTemplates("UNDEAD_LIZARD", 1,"Lizards_Hero_Male_Undead_57b70554-36bf-4b86-b9aa-8f7cc3944153");
+DB_LLFULOOT_Trader_RaceTemplates("DWARF", 0,"Dwarves_Hero_Female_c1c58707-b06e-499e-9c43-91a90be602b0");
+DB_LLFULOOT_Trader_RaceTemplates("DWARF", 1,"Dwarves_Hero_Male_024d1763-b2aa-46ec-b705-6338059838be");
+DB_LLFULOOT_Trader_RaceTemplates("ELF", 0,"Elves_Hero_Female_7ef846f5-34dc-450c-815e-a58dfc190a7b");
+DB_LLFULOOT_Trader_RaceTemplates("ELF", 1,"Elves_Hero_Male_19913083-924e-45ec-8b5b-119d5913722f");
+DB_LLFULOOT_Trader_RaceTemplates("HUMAN", 0,"Humans_Hero_Female_de8ea39b-6989-4b93-b34a-81e549c540f2");
+DB_LLFULOOT_Trader_RaceTemplates("HUMAN", 1,"Humans_Hero_Male_25611432-e5e4-482a-8f5d-196c9e90001e");
+DB_LLFULOOT_Trader_RaceTemplates("LIZARD", 0,"Lizards_Hero_Female_e4a6bcfa-ecd6-4e56-8592-cd16b85a1c50");
+DB_LLFULOOT_Trader_RaceTemplates("LIZARD", 1,"Lizards_Hero_Male_fa12e21f-0a10-47dd-af46-ab2c9a53cf6d");
 
 DB_LLFULOOT_Trader_GuardPresets(0, "Battlemage");
 DB_LLFULOOT_Trader_GuardPresets(1, "Cleric");
@@ -272,29 +273,31 @@ LLFULLOOT_Trader_RecordTraderRace(_Trader);
 PROC
 LLFULLOOT_Trader_RecordTraderRace((CHARACTERGUID)_Trader)
 AND
-CharacterGetRace(_Trader, 0, _Race)
+DB_LLFULOOT_Trader_RaceTemplates(_Tag, _Gender, _Template)
 AND
-_Race != ""
+NOT DB_LLFULOOT_Trader_Temp_TraderRace(_Trader, _)
+AND
+IsTagged(_Trader, _Tag, 1)
 THEN
-DebugBreak(_Race);
-DB_LLFULOOT_Trader_Temp_TraderRace(_Trader, _Race);
+DebugBreak(_Tag);
+DB_LLFULOOT_Trader_Temp_TraderRace(_Trader, _Tag);
 
 PROC
 LLFULLOOT_Trader_RecordTraderRace((CHARACTERGUID)_Trader)
 AND
 NOT DB_LLFULOOT_Trader_Temp_TraderRace(_Trader, _)
 AND
-NOT CharacterGetRace(_Trader, 0, _)
-AND
 GetTemplate(_Trader, _Template)
 AND
-DB_LLFULOOT_Trader_RaceTemplates(_Race, _GenderRan, _RaceTemplate)
+DB_LLFULOOT_Trader_RaceTemplates(_Tag, _Gender, _RaceTemplate)
 AND
 NOT DB_LLFULOOT_Trader_Temp_TraderRace(_Trader, _)
 AND
-StringContains(_Template, _Race, 1)
+StringSub(_RaceTemplate, 0, 5, _CheckStr)
+AND
+StringContains(_Template, _CheckStr, 1)
 THEN
-DB_LLFULOOT_Trader_Temp_TraderRace(_Trader, _Race);
+DB_LLFULOOT_Trader_Temp_TraderRace(_Trader, _Tag);
 
 PROC
 LLFULLOOT_Trader_RecordTraderRace((CHARACTERGUID)_Trader)
@@ -647,6 +650,23 @@ AND
 DB_ObjectTimer(_Trader, _ObjectTimerName, "LLFULOOT_Timers_ResetBodyguards")
 AND
 DB_LLFULLOOT_Trader_Bodyguards(_Trader, _Guard)
+AND
+GetDistanceTo(_Trader, _Guard, _Dist)
+AND
+_Dist < 20
+THEN
+SetStoryEvent(_Guard, "LLFULOOT_BodyguardArrivedAtTrader_Part2");
+
+IF
+ObjectEnteredCombat((CHARACTERGUID)_Trader, _CombatID)
+AND
+DB_ObjectTimer(_Trader, _ObjectTimerName, "LLFULOOT_Timers_ResetBodyguards")
+AND
+DB_LLFULLOOT_Trader_Bodyguards(_Trader, _Guard)
+AND
+GetDistanceTo(_Trader, _Guard, _Dist)
+AND
+_Dist >= 20
 THEN
 PlayEffect(_Guard, "RS3_FX_GP_ScriptedEvent_Teleport_GenericSmoke_01");
 TeleportTo(_Guard, _Trader, "LLFULOOT_BodyguardArrivedAtTrader_Part2", 1, 0);
@@ -654,13 +674,13 @@ TeleportTo(_Guard, _Trader, "LLFULOOT_BodyguardArrivedAtTrader_Part2", 1, 0);
 IF
 StoryEvent((CHARACTERGUID)_Guard, "LLFULOOT_BodyguardArrivedAtTrader_Part2")
 AND
+CharacterIsInCombat(_Guard, 0)
+AND
 DB_LLFULLOOT_Trader_Bodyguards(_Trader, _Guard)
 AND
 CombatGetIDForCharacter(_Trader, _CombatID)
 AND
 DB_CombatCharacters(_Character, _CombatID)
-AND
-CharacterIsInCombat(_Guard, 0)
 AND
 _Character != _Trader
 AND
@@ -669,6 +689,10 @@ AND
 CharacterIsEnemy(_Trader, _Character, 1)
 THEN
 EnterCombat(_Guard, _Character);
+
+IF
+StoryEvent((CHARACTERGUID)_Guard, "LLFULOOT_BodyguardArrivedAtTrader_Part2")
+THEN
 ProcObjectTimer(_Guard, "LLFULOOT_Timers_DisplayGuardText", 500);
 
 IF
