@@ -1,0 +1,5 @@
+new itemgroup "LLFULOOT_Trader_BeefPower"
+
+add levelgroup 0,0,"All"
+add rootgroup "f26caedf-9509-4687-bcac-1f596060bf57",""
+add namegroup "EMPTY","",""

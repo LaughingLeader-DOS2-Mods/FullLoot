@@ -1,0 +1,480 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+LLFULOOT_Trader_InitSettings();
+
+KBSECTION
+PROC
+LLFULOOT_Trader_InitSettings()
+THEN
+DB_LLFULOOT_Trader_RaceTemplates("Dwarf", 0,"Dwarves_Hero_Female_c1c58707-b06e-499e-9c43-91a90be602b0");
+DB_LLFULOOT_Trader_RaceTemplates("Dwarf", 1,"Dwarves_Hero_Male_024d1763-b2aa-46ec-b705-6338059838be");
+DB_LLFULOOT_Trader_RaceTemplates("Undead_Dwarf", 0,"Dwarves_Hero_Female_Undead_373a1966-a54d-4a3e-be70-e779a654c914");
+DB_LLFULOOT_Trader_RaceTemplates("Undead_Dwarf", 1,"Dwarves_Hero_Male_Undead_726442a5-6856-4b0d-91ed-5d2f003b8a0c");
+DB_LLFULOOT_Trader_RaceTemplates("Elf", 0,"Elves_Hero_Female_7ef846f5-34dc-450c-815e-a58dfc190a7b");
+DB_LLFULOOT_Trader_RaceTemplates("Elf", 1,"Elves_Hero_Male_19913083-924e-45ec-8b5b-119d5913722f");
+DB_LLFULOOT_Trader_RaceTemplates("Undead_Elf", 0,"Elves_Hero_Female_Undead_7f366172-9fd1-45df-8719-a6d14cb534b3");
+DB_LLFULOOT_Trader_RaceTemplates("Undead_Elf", 1,"Elves_Hero_Male_Undead_9eeaaafd-c47d-4650-9200-b00430d61e83");
+DB_LLFULOOT_Trader_RaceTemplates("Human", 0,"Humans_Hero_Female_de8ea39b-6989-4b93-b34a-81e549c540f2");
+DB_LLFULOOT_Trader_RaceTemplates("Human", 1,"Humans_Hero_Male_25611432-e5e4-482a-8f5d-196c9e90001e");
+DB_LLFULOOT_Trader_RaceTemplates("Undead_Human", 0,"Humans_Hero_Female_Undead_3bd0693d-0b0a-4f6d-93e2-aea9be654bee");
+DB_LLFULOOT_Trader_RaceTemplates("Undead_Human", 1,"Humans_Hero_Male_Undead_5ab5d036-4606-4265-962e-c2e4d2d2408b");
+DB_LLFULOOT_Trader_RaceTemplates("Lizard", 0,"Lizards_Hero_Female_e4a6bcfa-ecd6-4e56-8592-cd16b85a1c50");
+DB_LLFULOOT_Trader_RaceTemplates("Lizard", 1,"Lizards_Hero_Male_fa12e21f-0a10-47dd-af46-ab2c9a53cf6d");
+DB_LLFULOOT_Trader_RaceTemplates("Undead_Lizard", 0,"Lizards_Hero_Female_Undead_725f9a47-a3d4-41d2-92cf-017d18c2b212");
+DB_LLFULOOT_Trader_RaceTemplates("Undead_Lizard", 1,"Lizards_Hero_Male_Undead_57b70554-36bf-4b86-b9aa-8f7cc3944153");
+
+DB_LLFULOOT_Trader_GuardPresets(0, "Battlemage");
+DB_LLFULOOT_Trader_GuardPresets(1, "Cleric");
+DB_LLFULOOT_Trader_GuardPresets(2, "Conjurer");
+DB_LLFULOOT_Trader_GuardPresets(3, "Enchanter");
+DB_LLFULOOT_Trader_GuardPresets(4, "Fighter");
+DB_LLFULOOT_Trader_GuardPresets(5, "Inquisitor");
+DB_LLFULOOT_Trader_GuardPresets(6, "Knight");
+DB_LLFULOOT_Trader_GuardPresets(7, "Metamorph");
+DB_LLFULOOT_Trader_GuardPresets(8, "Ranger");
+DB_LLFULOOT_Trader_GuardPresets(9, "Rogue");
+DB_LLFULOOT_Trader_GuardPresets(10, "Shadowblade");
+DB_LLFULOOT_Trader_GuardPresets(11, "Wayfarer");
+DB_LLFULOOT_Trader_GuardPresets(12, "Witch");
+DB_LLFULOOT_Trader_GuardPresets(13, "Wizard");
+
+DB_LLFULOOT_Trader_GuardPresets2(0, "Battlemage_Act2");
+DB_LLFULOOT_Trader_GuardPresets2(1, "Cleric_Act2");
+DB_LLFULOOT_Trader_GuardPresets2(2, "Conjurer_Act2");
+DB_LLFULOOT_Trader_GuardPresets2(3, "Enchanter_Act2");
+DB_LLFULOOT_Trader_GuardPresets2(4, "Fighter_Act2");
+DB_LLFULOOT_Trader_GuardPresets2(5, "Inquisitor_Act2");
+DB_LLFULOOT_Trader_GuardPresets2(6, "Knight_Act2");
+DB_LLFULOOT_Trader_GuardPresets2(7, "Metamorph_Act2");
+DB_LLFULOOT_Trader_GuardPresets2(8, "Ranger_Act2");
+DB_LLFULOOT_Trader_GuardPresets2(9, "Rogue_Act2");
+DB_LLFULOOT_Trader_GuardPresets2(10, "Shadowblade_Act2");
+DB_LLFULOOT_Trader_GuardPresets2(11, "Wayfarer_Act2");
+DB_LLFULOOT_Trader_GuardPresets2(12, "Witch_Act2");
+DB_LLFULOOT_Trader_GuardPresets2(13, "Wizard_Act2");
+
+IF
+ObjectEnteredCombat((CHARACTERGUID)_Trader, _CombatID)
+AND
+DB_GlobalFlag("LLFULOOT_TraderDifficulty_Enabled")
+AND
+DB_GlobalFlag("LLFULOOT_TraderDifficulty_StrongerTraders")
+AND
+CharacterCanTrade(_Trader, 1)
+AND
+LLFULOOT_QRY_CanFullyLoot(_Trader)
+AND
+ObjectGetFlag(_Trader, "LLFULOOT_BeefModeEngaged", 0)
+AND
+CombatGetInvolvedPlayer(_CombatID, 1, _Player)
+AND
+CharacterIsEnemy(_Player, _Trader, 1)
+THEN
+ObjectSetFlag(_Trader, "LLFULOOT_BeefModeEngaged");
+ApplyStatus(_Trader, "LLFULOOT_TRADER_BEEF_MODE", -1.0, 1, _Trader);
+DebugBreak("[LLFULOOT:Trader:ObjectEnteredCombat] Beef mode engaged.");
+
+IF
+ItemEquipped(_Item, _Trader)
+AND
+GetTemplate(_Item, "EQ_Avatar_LLFULOOT_BeefPower_f26caedf-9509-4687-bcac-1f596060bf57")
+AND
+CharacterGetLevel(_Trader, _Level)
+THEN
+ItemLevelUpTo(_Item, _Level);
+
+IF
+ObjectLeftCombat((CHARACTERGUID)_Trader, _CombatID)
+AND
+CharacterIsDead(_Trader, 0)
+AND
+ObjectGetFlag(_Trader, "LLFULOOT_BeefModeEngaged", 1)
+THEN
+ObjectClearFlag(_Trader, "LLFULOOT_BeefModeEngaged");
+RemoveStatus(_Trader, "LLFULOOT_TRADER_BEEF_MODE");
+
+IF
+AttackedByObject((CHARACTERGUID)_Trader, (CHARACTERGUID)_Player, _, _, _)
+AND
+ObjectGetFlag(_Trader, "LLFULOOT_SpawnedGuards", 0)
+AND
+CharacterIsPlayer(_Player, 1)
+AND
+CharacterCanTrade(_Trader, 1)
+AND
+LLFULOOT_QRY_CanFullyLoot(_Trader)
+THEN
+ObjectSetFlag(_Trader, "LLFULOOT_CanSpawnGuards");
+
+IF
+CharacterAttitudeTowardsPlayerChanged(_Trader, _Player, _Attitude)
+AND
+ObjectGetFlag(_Trader, "LLFULOOT_CanSpawnGuards", 1)
+AND
+_Attitude > 0
+THEN
+ObjectClearFlag(_Trader, "LLFULOOT_CanSpawnGuards");
+
+IF
+ObjectEnteredCombat((CHARACTERGUID)_Trader, _CombatID)
+AND
+DB_GlobalFlag("LLFULOOT_TraderDifficulty_Enabled")
+AND
+DB_GlobalFlag("LLFULOOT_TraderDifficulty_SpawnGuards")
+AND
+ObjectGetFlag(_Trader, "LLFULOOT_CanSpawnGuards", 1) // Only traders attacked by players
+AND
+CharacterCanTrade(_Trader, 1)
+AND
+LLFULOOT_QRY_CanFullyLoot(_Trader)
+AND
+ObjectGetFlag(_Trader, "LLFULOOT_SpawnedGuards", 0)
+AND
+CombatGetInvolvedPlayer(_CombatID, 1, _Player)
+AND
+CharacterIsEnemy(_Player, _Trader, 1)
+THEN
+DebugBreak("[LLFULOOT:Trader:ObjectEnteredCombat] Spawning trader guards.");
+ObjectSetFlag(_Trader, "LLFULOOT_SpawnedGuards");
+ObjectClearFlag(_Trader, "LLFULOOT_CanSpawnGuards", 1);
+LLFULOOT_Trader_Internal_StartSpawningGuards(_Trader, _Player, _CombatID);
+
+PROC
+LLFULOOT_Trader_Internal_StartSpawningGuards((CHARACTERGUID)_Trader, (CHARACTERGUID)_Player, (INTEGER)_CombatID)
+AND
+NOT DB_LLFULOOT_Trader_Temp_SpawnGuards(_Trader, _Player, _CombatID, _)
+AND
+CharacterGetInventoryGoldValue(_Trader, _GoldValue)
+AND
+CharacterGetLevel(_Trader, _Level)
+AND
+IntegerDivide(_GoldValue, _Level, _IntA)
+AND
+IntegerDivide(_IntA, 1000, _IntB)
+AND
+IntegerSum(_IntB, 1, _IntC)
+AND
+IntegerMax(_IntC, 3, _Max)
+AND
+Random(99999, _Ran)
+AND
+IntegerModulo(_Ran, _Max, _IntD)
+AND
+IntegerMax(_IntC, 1, _GuardAmount)
+AND
+IntegertoString(1, _AmountStr)
+AND
+StringConcatenate("[LLFULOOT:Trader:SpawnGuards] Spawning [", _AmountStr, _Str1)
+AND
+StringConcatenate(_Str1, "] guards.", _Msg)
+THEN
+DebugBreak(_Msg);
+LLFULLOOT_Trader_RecordTraderRace(_Trader); // Fill DB_LLFULOOT_Trader_Temp_TraderRace
+DB_LLFULOOT_Trader_Temp_SpawnGuards(_Trader, _Player, _CombatID, _GuardAmount);
+ProcObjectTimer(_Trader, "LLFULOOT_Timers_SpawnGuards", 1000);
+
+PROC
+ProcObjectTimerFinished((CHARACTERGUID)_Trader, "LLFULOOT_Timers_SpawnGuards")
+THEN
+DebugBreak("[LLFULOOT:Trader:ProcObjectTimerFinished:LLFULOOT_Timers_SpawnGuards] Spawning next guard.");
+LLFULOOT_Trader_Internal_SpawnGuard(_Trader);
+
+QRY
+LLFULLOOT_Trader_QRY_GetTraderRace((CHARACTERGUID)_Trader)
+THEN
+LLFULLOOT_Trader_RecordTraderRace(_Trader);
+
+PROC
+LLFULLOOT_Trader_RecordTraderRace((CHARACTERGUID)_Trader)
+AND
+CharacterGetRace(_Trader, 0, _Race)
+AND
+_Race != ""
+THEN
+DB_LLFULOOT_Trader_Temp_TraderRace(_Trader, _Race);
+
+PROC
+LLFULLOOT_Trader_RecordTraderRace((CHARACTERGUID)_Trader)
+AND
+NOT DB_LLFULOOT_Trader_Temp_TraderRace(_Trader, _)
+AND
+NOT CharacterGetRace(_Trader, 0, _)
+AND
+GetTemplate(_Trader, _Template)
+AND
+DB_LLFULOOT_Trader_RaceTemplates(_Race, _GenderRan, _RaceTemplate)
+AND
+NOT DB_LLFULOOT_Trader_Temp_TraderRace(_Trader, _)
+AND
+StringContains(_Template, _Race, 1)
+THEN
+DB_LLFULOOT_Trader_Temp_TraderRace(_Trader, _Race);
+
+QRY
+LLFULLOOT_Trader_QRY_IsUndead((CHARACTERGUID)_Trader)
+AND
+IsTagged(_Trader, "UNDEAD", 1)
+THEN
+DB_NOOP(1);
+
+QRY
+LLFULLOOT_Trader_QRY_IsUndead((CHARACTERGUID)_Trader)
+AND
+IsTagged(_Trader, "UNDEAD_BEAST", 1)
+THEN
+DB_NOOP(1);
+
+PROC
+LLFULLOOT_Trader_RecordTraderRace((CHARACTERGUID)_Trader)
+AND
+NOT DB_LLFULOOT_Trader_Temp_TraderRace(_Trader, _)
+AND
+LLFULLOOT_Trader_QRY_IsUndead(_Trader)
+THEN
+DB_LLFULOOT_Trader_Temp_TraderRace(_Trader, "Undead_Human");
+
+PROC
+LLFULLOOT_Trader_RecordTraderRace((CHARACTERGUID)_Trader)
+AND
+NOT DB_LLFULOOT_Trader_Temp_TraderRace(_Trader, _)
+AND
+NOT LLFULLOOT_Trader_QRY_IsUndead(_Trader)
+THEN
+DB_LLFULOOT_Trader_Temp_TraderRace(_Trader, "Human");
+
+QRY
+LLFULLOOT_Trader_QRY_GetGuardTemplate((CHARACTERGUID)_Trader, (STRING)_Race)
+THEN
+LLFULLOOT_Trader_SetGuardTemplate(_Trader, _Race);
+
+PROC
+LLFULLOOT_Trader_SetGuardTemplate((CHARACTERGUID)_Trader, (STRING)_Race)
+AND
+NOT DB_LLFULOOT_Trader_Temp_NextGuardTemplate(_Trader, _)
+AND
+StringContains(_Race, "Undead", 0)
+THEN
+DebugBreak("[LLFULOOT:Trader:QRY_GetGuardTemplate] Next guard template is [LLFULOOT_Guard_Normal].");
+DB_LLFULOOT_Trader_Temp_NextGuardTemplate(_Trader, "LLFULOOT_Guard_Normal_0093d0d1-1e98-4c09-8fea-3c0b1dce37c4");
+
+PROC
+LLFULLOOT_Trader_SetGuardTemplate((CHARACTERGUID)_Trader, (STRING)_Race)
+AND
+NOT DB_LLFULOOT_Trader_Temp_NextGuardTemplate(_Trader, _)
+AND
+StringContains(_Race, "Undead", 1)
+THEN
+DebugBreak("[LLFULOOT:Trader:QRY_GetGuardTemplate] Next guard template is [LLFULOOT_Guard_Undead].");
+DB_LLFULOOT_Trader_Temp_NextGuardTemplate(_Trader, "LLFULOOT_Guard_Undead_777fa141-15b9-4613-8e01-697117242c7f");
+
+PROC
+LLFULLOOT_Trader_SetGuardTemplate((CHARACTERGUID)_Trader, (STRING)_Race)
+AND
+NOT DB_LLFULOOT_Trader_Temp_NextGuardTemplate(_Trader, _)
+THEN
+DebugBreak("[LLFULOOT:Trader:QRY_GetGuardTemplate] No race match. Next guard template defaulted to [LLFULOOT_Guard_Normal].");
+DB_LLFULOOT_Trader_Temp_NextGuardTemplate(_Trader, "LLFULOOT_Guard_Normal_0093d0d1-1e98-4c09-8fea-3c0b1dce37c4");
+
+QRY
+LLFULLOOT_Trader_QRY_SetGuardPreset((CHARACTERGUID)_Trader, (INTEGER)_Level, (INTEGER)_PresetIndex)
+AND
+NOT DB_LLFULOOT_Trader_Temp_NextGuardPreset(_Trader, _)
+AND
+_Level <= 10
+AND
+DB_LLFULOOT_Trader_GuardPresets(_PresetIndex, _Preset)
+AND
+StringConcatenate("[LLFULOOT:Trader:QRY_SetGuardPreset] Applying preset [", _Preset, _Str1)
+AND
+StringConcatenate(_Str1, "] to guard.", _Str2)
+THEN
+DebugBreak(_Str2);
+DB_LLFULOOT_Trader_Temp_NextGuardPreset(_Trader, _Preset);
+
+QRY
+LLFULLOOT_Trader_QRY_SetGuardPreset((CHARACTERGUID)_Trader, (INTEGER)_Level, (INTEGER)_PresetIndex)
+AND
+NOT DB_LLFULOOT_Trader_Temp_NextGuardPreset(_Trader, _)
+AND
+_Level > 10
+AND
+DB_LLFULOOT_Trader_GuardPresets(_PresetIndex, _Preset)
+AND
+StringConcatenate(_Preset, "_Act2", _FinalPreset)
+AND
+StringConcatenate("[LLFULOOT:Trader:QRY_SetGuardPreset] Applying preset [", _FinalPreset, _Str1)
+AND
+StringConcatenate(_Str1, "] to guard.", _Str2)
+THEN
+DebugBreak(_Str2);
+DB_LLFULOOT_Trader_Temp_NextGuardPreset(_Trader, _FinalPreset);
+
+
+/*
+QRY
+LLFULLOOT_Trader_QRY_SetGuardPreset((CHARACTERGUID)_Trader, (INTEGER)_Level, (INTEGER)_PresetIndex)
+AND
+NOT DB_LLFULOOT_Trader_Temp_NextGuardPreset(_Trader, _)
+AND
+_Level > 10
+AND
+DB_LLFULOOT_Trader_GuardPresets2(_PresetIndex, _Preset)
+AND
+StringConcatenate("[LLFULOOT:Trader:QRY_SetGuardPreset] Applying preset [", _Preset, _Str1)
+AND
+StringConcatenate(_Str1, "] to guard.", _Str2)
+THEN
+DebugBreak(_Str2);
+DB_LLFULOOT_Trader_Temp_NextGuardPreset(_Trader, _Preset);
+*/
+
+PROC
+LLFULOOT_Trader_Internal_SpawnGuard((CHARACTERGUID)_Trader)
+AND
+DB_LLFULOOT_Trader_Temp_SpawnGuards(_Trader, _Player, _CombatID, _GuardAmount)
+AND
+_GuardAmount > 0
+AND
+IntegerSubtract(_GuardAmount, 1, _NextAmount)
+AND
+Random(1, _GenderRan)
+AND
+DB_LLFULOOT_Trader_Temp_TraderRace(_Trader, _Race)
+AND
+DB_LLFULOOT_Trader_RaceTemplates(_Race, _GenderRan, _RaceTemplate)
+AND
+LLFULLOOT_Trader_QRY_GetGuardTemplate(_Trader, _Race)
+AND
+DB_LLFULOOT_Trader_Temp_NextGuardTemplate(_Trader, _GuardTemplate)
+AND
+TemporaryCharacterCreateOutOfSightToObject(_GuardTemplate, _Player, _Trader, 0, "", _Guard)
+AND
+GetFaction(_Trader, _Faction)
+AND
+CharacterGetLevel(_Trader, _Level)
+AND
+SysCount("DB_LLFULOOT_Trader_GuardPresets", 2, _PresetTotal)
+AND
+IntegerSubtract(_PresetTotal, 1, _LastIndex)
+AND
+Random(99999, _PresetRan)
+AND
+IntegerModulo(_PresetRan, _LastIndex, _PresetIndex)
+AND
+LLFULLOOT_Trader_QRY_SetGuardPreset(_Trader, _Level, _PresetIndex)
+AND
+DB_LLFULOOT_Trader_Temp_NextGuardPreset(_Trader, _Preset)
+AND
+CharacterGetDisplayName(_Trader, _, _TraderName)
+AND
+StringConcatenate(_TraderName, "'s Bodyguard", _Name)
+THEN
+DebugBreak("[LLFULOOT:Trader:Internal:SpawnGuard] Spawned guard.");
+NOT DB_LLFULOOT_Trader_Temp_NextGuardPreset(_Trader, _Preset);
+NOT DB_LLFULOOT_Trader_Temp_NextGuardTemplate(_Trader, _GuardTemplate);
+NOT DB_LLFULOOT_Trader_Temp_SpawnGuards(_Trader, _Player, _CombatID, _GuardAmount);
+DB_LLFULOOT_Trader_Temp_SpawnGuards(_Trader, _Player, _CombatID, _NextAmount);
+DB_LLFULOOT_Trader_Temp_GuardCombat(_Trader, _Guard, _Player, _CombatID);
+//CharacterApplyRacePreset(_Guard, _Race);
+CharacterTransform(_Guard, _RaceTemplate, 0, 1, 0, 0, 0, 0, 1); // Appearance only
+CharacterSetCustomName(_Guard, _Name);
+
+SetOnStage(_Guard, 0);
+CharacterMakePlayer(_Guard);
+CharacterApplyPreset(_Guard, _Preset);
+//PROC_GLO_PartyMembers_Kick(_Guard, _Faction);
+CharacterMakeNPC(_Guard);
+
+SetFaction(_Guard, _Faction);
+CharacterAddAttitudeTowardsPlayer(_Guard, _Trader, 100);
+CharacterAddAttitudeTowardsPlayer(_Guard, _Player, -100);
+CharacterSetRelationIndivFactionToFaction(_Guard, "Hero", -100);
+
+CharacterLevelUpTo(_Guard, _Level);
+
+SetTag(_Guard, "LLFULOOT_TraderGuard");
+SetTag(_Guard, "GUARD");
+TeleportTo(_Guard, _Trader, "LLFULOOT_GuardAppeared", 0, 0);
+LLFULOOT_Trader_Internal_SpawnNextGuard(_Trader);
+
+PROC
+LLFULOOT_Trader_Internal_SpawnNextGuard((CHARACTERGUID)_Trader)
+AND
+DB_LLFULOOT_Trader_Temp_SpawnGuards(_Trader, _Player, _CombatID, _GuardAmount)
+AND
+_GuardAmount <= 0
+AND
+DB_LLFULOOT_Trader_Temp_TraderRace(_Trader, _Race)
+THEN
+NOT DB_LLFULOOT_Trader_Temp_SpawnGuards(_Trader, _Player, _CombatID, _GuardAmount);
+NOT DB_LLFULOOT_Trader_Temp_TraderRace(_Trader, _Race);
+DebugBreak("[LLFULOOT:Trader:Internal:SpawnNextGuard] Finished spawning guards.");
+
+PROC
+LLFULOOT_Trader_Internal_SpawnNextGuard((CHARACTERGUID)_Trader)
+AND
+DB_LLFULOOT_Trader_Temp_SpawnGuards(_Trader, _Player, _CombatID, _GuardAmount)
+AND
+_GuardAmount > 0
+THEN
+DebugBreak("[LLFULOOT:Trader:Internal:SpawnNextGuard] Spawning next guard after 500ms.");
+ProcObjectTimer(_Trader, "LLFULOOT_Timers_SpawnGuards", 500);
+
+IF
+StoryEvent((CHARACTERGUID)_Guard, "LLFULOOT_GuardAppeared")
+THEN
+//CharacterTransformFromCharacter(_Guard, _Guard, 0, 0, 0, 0, 0, 0, 1); // Release player data
+CharacterSetCorpseLootable(_Guard, 0);
+CharacterSetCanTrade(_Guard, 0);
+Foop(_Guard);
+DebugBreak("[LLFULOOT:Trader:StoryEvent:LLFULOOT_GuardAppeared] Guard 'fooped' into position.");
+ProcObjectTimer(_Guard, "LLFULOOT_Timers_DisplayGuardText", 500);
+
+PROC
+ProcObjectTimerFinished((CHARACTERGUID)_Guard, "LLFULOOT_Timers_DisplayGuardText")
+AND
+Random(999, _Ran)
+AND
+IntegerModulo(_Ran, 4, _LineIndex)
+AND
+IntegertoString(_LineIndex, _LineIndexStr)
+AND
+StringConcatenate("LLFULOOT_GuardAppeared_Line", _LineIndexStr, _Line)
+THEN
+DisplayText(_Guard, _Line);
+
+IF
+StoryEvent((CHARACTERGUID)_Guard, "LLFULOOT_GuardAppeared")
+AND
+DB_LLFULOOT_Trader_Temp_GuardCombat(_Trader, _Guard, _Player, _CombatID)
+THEN
+NOT DB_LLFULOOT_Trader_Temp_GuardCombat(_Trader, _Guard, _Player, _CombatID);
+SetTag(_Guard, "LLFULOOT_LootDisabled");
+EnterCombat(_Guard, _Player);
+JumpToTurn(_Guard);
+DebugBreak("[LLFULOOT:Trader:StoryEvent('GuardAppeared')] Trader guard entered combat.");
+
+//The status attempt seems to fire before CharacterDying, which ultimately prevents an empty backpack from being dropped.
+IF
+CharacterStatusAttempt(_Guard, "DYING", _)
+AND
+IsTagged(_Guard, "LLFULOOT_TraderGuard", 1)
+AND
+GetPosition(_Guard, _x, _y, _z)
+AND
+CreateItemTemplateAtPosition("S_LLFULOOT_InvisibleBackpack_394d4e05-b258-4b3f-a78b-eff97a25b231", _x, _y, _z, _Backpack)
+THEN
+MoveAllItemsTo(_Guard, _Backpack, 0, 0, 0);
+ItemRemove(_Backpack);
+
+IF
+CharacterDied(_Guard)
+AND
+IsTagged(_Guard, "LLFULOOT_TraderGuard", 1)
+THEN
+Poof(_Guard);
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "LaughingLeader_FullLoot"

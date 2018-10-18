@@ -100,6 +100,56 @@ AND
 QRY_SpeakerIsAvailable(_Host)
 THEN
 Proc_StartDialog(0, "LLFULOOT_SettingsMenu", _Host, _Host);
+
+IF
+GlobalFlagCleared("LLFULOOT_TraderDifficulty_StrongerTraders")
+AND
+NOT DB_GlobalFlag("LLFULOOT_TraderDifficulty_SpawnGuards")
+THEN
+GlobalClearFlag("LLFULOOT_TraderDifficulty_Enabled");
+
+IF
+GlobalFlagCleared("LLFULOOT_TraderDifficulty_SpawnGuards")
+AND
+NOT DB_GlobalFlag("LLFULOOT_TraderDifficulty_StrongerTraders")
+THEN
+GlobalClearFlag("LLFULOOT_TraderDifficulty_Enabled");
+
+//REGION DEBUG
+IF
+GameStarted(_, 1)
+THEN
+GlobalSetFlag("LLFULOOT_AdjustGoldAmounts");
+GlobalSetFlag("LLFULOOT_GoldReduction_Fourth");
+GlobalSetFlag("LLFULOOT_EquippedArmorLootable");
+GlobalSetFlag("LLFULOOT_EquippedWeaponsLootable");
+GlobalSetFlag("LLFULOOT_TraderDifficulty_Enabled");
+GlobalSetFlag("LLFULOOT_TraderDifficulty_StrongerTraders");
+GlobalSetFlag("LLFULOOT_TraderDifficulty_SpawnGuards");
+
+IF
+GameStarted(_, 1)
+AND
+CharacterGetHostCharacter(_Host)
+THEN
+CharacterAddAbility(_Host, "Loremaster", 5);
+
+IF
+GameStarted("_TMPL_Sandbox", 1)
+THEN
+CharacterLaunchIterator("LLFULOOT_LevelUpNPC");
+
+IF
+StoryEvent((CHARACTERGUID)_NPC, "LLFULOOT_LevelUpNPC")
+AND
+CharacterGetHostCharacter(_Host)
+AND
+_NPC != _Host
+AND
+CharacterGetLevel(_Host, _Level)
+THEN
+CharacterLevelUpTo(_NPC, _Level);
+//END_REGION
 EXITSECTION
 
 ENDEXITSECTION

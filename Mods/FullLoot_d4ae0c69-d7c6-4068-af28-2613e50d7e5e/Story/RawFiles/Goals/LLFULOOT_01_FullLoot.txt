@@ -1,8 +1,15 @@
 Version 1
 SubGoalCombiner SGC_AND
 INITSECTION
-
+LLFULOOT_InitSettings();
 KBSECTION
+
+PROC
+LLFULOOT_InitSettings()
+THEN
+DB_NOOP(1);
+//DB_LLFULOOT_TemplateBlacklist("EQ_Avatar_LLFULOOT_BeefPower_f26caedf-9509-4687-bcac-1f596060bf57");
+
 IF
 TradeGenerationEnded(_Trader)
 AND
@@ -12,6 +19,8 @@ ObjectSetFlag(_Trader, "LLFULOOT_GeneratedTradeTreasure");
 
 QRY
 LLFULOOT_QRY_CanFullyLoot((CHARACTERGUID)_Character)
+AND
+IsTagged(_Character, "LLFULOOT_LootDisabled", 0)
 AND
 NOT DB_IsStoryNpc(_Character)
 AND
@@ -64,6 +73,32 @@ MoveAllItemsTo(_Character, _Backpack, _Armor, _Weapons, 0);
 DebugBreak("[LLFULOOT:CharacterStatusAttempt(DYING)] Moved all items to a backpack.");
 DB_LLFULOOT_Temp_TraderBackpack(_Character, _Backpack);
 
+IF
+ItemAddedToContainer(_Item, _Backpack)
+AND
+GetTemplate(_Backpack, "S_LLFULOOT_InvisibleBackpack_394d4e05-b258-4b3f-a78b-eff97a25b231")
+AND
+GetTemplate(_Item, _Template)
+AND
+StringContains(_Template, "EQ_Avatar", 1)
+THEN
+ItemRemove(_Item);
+
+IF
+ItemAddedToContainer(_Item, _Backpack)
+AND
+GetTemplate(_Backpack, "S_LLFULOOT_InvisibleBackpack_394d4e05-b258-4b3f-a78b-eff97a25b231")
+AND
+SysCount("DB_LLFULOOT_TemplateBlacklist", 1, _Count)
+AND
+_Count > 0
+AND
+GetTemplate(_Item, _Template)
+AND
+DB_LLFULOOT_TemplateBlacklist((STRING)_Template)
+THEN
+ItemRemove(_Item);
+
 QRY
 LLFULOOT_QRY_EitherCharacterIsAPlayer((CHARACTERGUID)_Owner, (CHARACTERGUID)_Attacker)
 AND
@@ -82,6 +117,8 @@ IF
 CharacterKilledBy(_Character, _Owner, _Attacker)
 AND
 GlobalGetFlag("LLFULOOT_PVPLootEnabled", 1)
+AND
+IsTagged(_Character, "LLFULOOT_LootDisabled", 0)
 AND
 CharacterIsPlayer(_Character, 1)
 AND
@@ -190,16 +227,6 @@ THEN
 NOT DB_LLFULOOT_Temp_GoldAmount(_Character, _SetAmount);
 CharacterAddGold(_Character, _SetAmount);
 DebugBreak("[LLFULOOT:AdjustGold] Added a reduced amount of previous gold to trader.");
-
-//REGION DEBUG
-IF
-GameStarted(_, 1)
-THEN
-GlobalSetFlag("LLFULOOT_AdjustGoldAmounts");
-GlobalSetFlag("LLFULOOT_GoldReduction_Fourth");
-GlobalSetFlag("LLFULOOT_EquippedArmorLootable");
-GlobalSetFlag("LLFULOOT_EquippedWeaponsLootable");
-//END_REGION
 EXITSECTION
 
 ENDEXITSECTION
