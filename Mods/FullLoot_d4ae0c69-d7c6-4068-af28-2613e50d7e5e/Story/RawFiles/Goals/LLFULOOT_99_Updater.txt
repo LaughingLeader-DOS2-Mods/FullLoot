@@ -3,7 +3,6 @@ SubGoalCombiner SGC_AND
 INITSECTION
 LLFULOOT_Internal_RegisterMod();
 KBSECTION
-
 //REGION VERSIONING
 IF
 GameStarted(_Level, _)
@@ -69,6 +68,9 @@ DB_LLFULOOT_RegisteredLeaderLibSettings(1)
 THEN
 DB_LeaderLib_ModApi_RegisterActiveGoal("FullLoot", "LaughingLeader", "LLFULOOT_99_Updater");
 DB_LeaderLib_ModApi_RegisterMenu("LaughingLeader.FullLoot", "[Full Loot] Settings", "LLFULOOT_SettingsMenu", "FullLoot", "LaughingLeader");
+DB_LeaderLib_Treasure_TreasureItemTemplates("LeaderLib.LeaderTrader.ModBooks", "BOOK_LLFULOOT_SettingsMenu_7056c5bd-5d3a-44c3-8511-df02f6464ccf", 1, "");
+DB_LeaderLib_Treasure_ItemMaxAmount("LeaderLib.LeaderTrader.ModBooks", "BOOK_LLFULOOT_SettingsMenu_7056c5bd-5d3a-44c3-8511-df02f6464ccf", 1);
+
 //END_REGION
 
 EXITSECTION

@@ -74,14 +74,14 @@ THEN
 DB_NOOP(1);
 
 QRY
-LLFULLOOT_Trader_QRY_IsUndead((CHARACTERGUID)_Trader)
+LLFULOOT_Trader_QRY_IsUndead((CHARACTERGUID)_Trader)
 AND
 IsTagged(_Trader, "UNDEAD", 1)
 THEN
 DB_NOOP(1);
 
 QRY
-LLFULLOOT_Trader_QRY_IsUndead((CHARACTERGUID)_Trader)
+LLFULOOT_Trader_QRY_IsUndead((CHARACTERGUID)_Trader)
 AND
 IsTagged(_Trader, "UNDEAD_BEAST", 1)
 THEN
@@ -302,7 +302,7 @@ AND
 StringConcatenate(_Str1, "] guards.", _Msg)
 THEN
 DebugBreak(_Msg);
-LLFULLOOT_Trader_RecordTraderRace(_Trader); // Fill DB_LLFULOOT_Trader_Temp_TraderRace
+LLFULOOT_Trader_RecordTraderRace(_Trader); // Fill DB_LLFULOOT_Trader_Temp_TraderRace
 DB_LLFULOOT_Trader_Temp_SpawnGuards(_Trader, _Player, _CombatID, _GuardAmount);
 ProcObjectTimer(_Trader, "LLFULOOT_Timers_SpawnGuards", 1000);
 
@@ -313,12 +313,12 @@ DebugBreak("[LLFULOOT:Trader:ProcObjectTimerFinished:LLFULOOT_Timers_SpawnGuards
 LLFULOOT_Trader_Internal_SpawnGuard(_Trader);
 
 QRY
-LLFULLOOT_Trader_QRY_GetTraderRace((CHARACTERGUID)_Trader)
+LLFULOOT_Trader_QRY_GetTraderRace((CHARACTERGUID)_Trader)
 THEN
-LLFULLOOT_Trader_RecordTraderRace(_Trader);
+LLFULOOT_Trader_RecordTraderRace(_Trader);
 
 PROC
-LLFULLOOT_Trader_RecordTraderRace((CHARACTERGUID)_Trader)
+LLFULOOT_Trader_RecordTraderRace((CHARACTERGUID)_Trader)
 AND
 DB_LLFULOOT_Trader_RaceTemplates(_Tag, _Gender, _Template)
 AND
@@ -330,7 +330,7 @@ DebugBreak(_Tag);
 DB_LLFULOOT_Trader_Temp_TraderRace(_Trader, _Tag);
 
 PROC
-LLFULLOOT_Trader_RecordTraderRace((CHARACTERGUID)_Trader)
+LLFULOOT_Trader_RecordTraderRace((CHARACTERGUID)_Trader)
 AND
 NOT DB_LLFULOOT_Trader_Temp_TraderRace(_Trader, _)
 AND
@@ -347,30 +347,30 @@ THEN
 DB_LLFULOOT_Trader_Temp_TraderRace(_Trader, _Tag);
 
 PROC
-LLFULLOOT_Trader_RecordTraderRace((CHARACTERGUID)_Trader)
+LLFULOOT_Trader_RecordTraderRace((CHARACTERGUID)_Trader)
 AND
 NOT DB_LLFULOOT_Trader_Temp_TraderRace(_Trader, _)
 AND
-LLFULLOOT_Trader_QRY_IsUndead(_Trader)
+LLFULOOT_Trader_QRY_IsUndead(_Trader)
 THEN
 DB_LLFULOOT_Trader_Temp_TraderRace(_Trader, "Undead_Human");
 
 PROC
-LLFULLOOT_Trader_RecordTraderRace((CHARACTERGUID)_Trader)
+LLFULOOT_Trader_RecordTraderRace((CHARACTERGUID)_Trader)
 AND
 NOT DB_LLFULOOT_Trader_Temp_TraderRace(_Trader, _)
 AND
-NOT LLFULLOOT_Trader_QRY_IsUndead(_Trader)
+NOT LLFULOOT_Trader_QRY_IsUndead(_Trader)
 THEN
 DB_LLFULOOT_Trader_Temp_TraderRace(_Trader, "Human");
 
 QRY
-LLFULLOOT_Trader_QRY_GetGuardTemplate((CHARACTERGUID)_Trader, (STRING)_Race)
+LLFULOOT_Trader_QRY_GetGuardTemplate((CHARACTERGUID)_Trader, (STRING)_Race)
 THEN
-LLFULLOOT_Trader_SetGuardTemplate(_Trader, _Race);
+LLFULOOT_Trader_SetGuardTemplate(_Trader, _Race);
 
 PROC
-LLFULLOOT_Trader_SetGuardTemplate((CHARACTERGUID)_Trader, (STRING)_Race)
+LLFULOOT_Trader_SetGuardTemplate((CHARACTERGUID)_Trader, (STRING)_Race)
 AND
 NOT DB_LLFULOOT_Trader_Temp_NextGuardTemplate(_Trader, _)
 AND
@@ -380,7 +380,7 @@ DebugBreak("[LLFULOOT:Trader:QRY_GetGuardTemplate] Next guard template is [LLFUL
 DB_LLFULOOT_Trader_Temp_NextGuardTemplate(_Trader, "LLFULOOT_Guard_Normal_0093d0d1-1e98-4c09-8fea-3c0b1dce37c4");
 
 PROC
-LLFULLOOT_Trader_SetGuardTemplate((CHARACTERGUID)_Trader, (STRING)_Race)
+LLFULOOT_Trader_SetGuardTemplate((CHARACTERGUID)_Trader, (STRING)_Race)
 AND
 NOT DB_LLFULOOT_Trader_Temp_NextGuardTemplate(_Trader, _)
 AND
@@ -390,7 +390,7 @@ DebugBreak("[LLFULOOT:Trader:QRY_GetGuardTemplate] Next guard template is [LLFUL
 DB_LLFULOOT_Trader_Temp_NextGuardTemplate(_Trader, "LLFULOOT_Guard_Undead_777fa141-15b9-4613-8e01-697117242c7f");
 
 PROC
-LLFULLOOT_Trader_SetGuardTemplate((CHARACTERGUID)_Trader, (STRING)_Race)
+LLFULOOT_Trader_SetGuardTemplate((CHARACTERGUID)_Trader, (STRING)_Race)
 AND
 NOT DB_LLFULOOT_Trader_Temp_NextGuardTemplate(_Trader, _)
 THEN
@@ -398,7 +398,7 @@ DebugBreak("[LLFULOOT:Trader:QRY_GetGuardTemplate] No race match. Next guard tem
 DB_LLFULOOT_Trader_Temp_NextGuardTemplate(_Trader, "LLFULOOT_Guard_Normal_0093d0d1-1e98-4c09-8fea-3c0b1dce37c4");
 
 QRY
-LLFULLOOT_Trader_QRY_SetGuardPreset((CHARACTERGUID)_Trader, (INTEGER)_Level, (INTEGER)_PresetIndex)
+LLFULOOT_Trader_QRY_SetGuardPreset((CHARACTERGUID)_Trader, (INTEGER)_Level, (INTEGER)_PresetIndex)
 AND
 NOT DB_LLFULOOT_Trader_Temp_NextGuardPreset(_Trader, _)
 AND
@@ -414,7 +414,7 @@ DebugBreak(_Str2);
 DB_LLFULOOT_Trader_Temp_NextGuardPreset(_Trader, _Preset);
 
 QRY
-LLFULLOOT_Trader_QRY_SetGuardPreset((CHARACTERGUID)_Trader, (INTEGER)_Level, (INTEGER)_PresetIndex)
+LLFULOOT_Trader_QRY_SetGuardPreset((CHARACTERGUID)_Trader, (INTEGER)_Level, (INTEGER)_PresetIndex)
 AND
 NOT DB_LLFULOOT_Trader_Temp_NextGuardPreset(_Trader, _)
 AND
@@ -434,7 +434,7 @@ DB_LLFULOOT_Trader_Temp_NextGuardPreset(_Trader, _FinalPreset);
 
 /*
 QRY
-LLFULLOOT_Trader_QRY_SetGuardPreset((CHARACTERGUID)_Trader, (INTEGER)_Level, (INTEGER)_PresetIndex)
+LLFULOOT_Trader_QRY_SetGuardPreset((CHARACTERGUID)_Trader, (INTEGER)_Level, (INTEGER)_PresetIndex)
 AND
 NOT DB_LLFULOOT_Trader_Temp_NextGuardPreset(_Trader, _)
 AND
@@ -465,7 +465,7 @@ DB_LLFULOOT_Trader_Temp_TraderRace(_Trader, _Race)
 AND
 DB_LLFULOOT_Trader_RaceTemplates(_Race, _GenderRan, _RaceTemplate)
 AND
-LLFULLOOT_Trader_QRY_GetGuardTemplate(_Trader, _Race)
+LLFULOOT_Trader_QRY_GetGuardTemplate(_Trader, _Race)
 AND
 DB_LLFULOOT_Trader_Temp_NextGuardTemplate(_Trader, _GuardTemplate)
 AND
@@ -483,7 +483,7 @@ Random(99999, _PresetRan)
 AND
 IntegerModulo(_PresetRan, _LastIndex, _PresetIndex)
 AND
-LLFULLOOT_Trader_QRY_SetGuardPreset(_Trader, _Level, _PresetIndex)
+LLFULOOT_Trader_QRY_SetGuardPreset(_Trader, _Level, _PresetIndex)
 AND
 DB_LLFULOOT_Trader_Temp_NextGuardPreset(_Trader, _Preset)
 AND
@@ -516,7 +516,7 @@ CharacterLevelUpTo(_Guard, _Level);
 
 SetTag(_Guard, "LLFULOOT_TraderGuard");
 SetTag(_Guard, "GUARD");
-DB_LLFULLOOT_Trader_Bodyguards(_Trader, _Guard);
+DB_LLFULOOT_Trader_Bodyguards(_Trader, _Guard);
 TeleportTo(_Guard, _Trader, "LLFULOOT_GuardAppeared", 0, 0);
 LLFULOOT_Trader_Internal_SpawnNextGuard(_Trader);
 
@@ -605,7 +605,7 @@ CharacterKilledBy(_Trader, _Player, _)
 AND
 CharacterIsPlayer(_Player, 1)
 AND
-DB_LLFULLOOT_Trader_Bodyguards(_Trader, _Guard)
+DB_LLFULOOT_Trader_Bodyguards(_Trader, _Guard)
 AND
 CharacterIsInCombat(_Guard, 0)
 AND
@@ -663,7 +663,7 @@ NOT DB_LLFULOOT_Trader_Temp_TraderMurderer(_Guard, _Trader, _Murderer);
 IF
 ObjectLeftCombat((CHARACTERGUID)_Guard, _CombatID)
 AND
-DB_LLFULLOOT_Trader_Bodyguards(_Trader, _Guard)
+DB_LLFULOOT_Trader_Bodyguards(_Trader, _Guard)
 AND
 CharacterIsDead(_Trader, 0)
 AND
@@ -674,7 +674,7 @@ ProcCharacterFollowCharacter(_Guard, _Trader);
 IF
 ObjectEnteredCombat((CHARACTERGUID)_Guard, _CombatID)
 AND
-DB_LLFULLOOT_Trader_Bodyguards(_Trader, _Guard)
+DB_LLFULOOT_Trader_Bodyguards(_Trader, _Guard)
 AND
 DB_Following(_Guard, _Trader)
 THEN
@@ -696,7 +696,7 @@ ObjectEnteredCombat((CHARACTERGUID)_Trader, _CombatID)
 AND
 DB_ObjectTimer(_Trader, _ObjectTimerName, "LLFULOOT_Timers_ResetBodyguards")
 AND
-DB_LLFULLOOT_Trader_Bodyguards(_Trader, _Guard)
+DB_LLFULOOT_Trader_Bodyguards(_Trader, _Guard)
 AND
 GetDistanceTo(_Trader, _Guard, _Dist)
 AND
@@ -709,7 +709,7 @@ ObjectEnteredCombat((CHARACTERGUID)_Trader, _CombatID)
 AND
 DB_ObjectTimer(_Trader, _ObjectTimerName, "LLFULOOT_Timers_ResetBodyguards")
 AND
-DB_LLFULLOOT_Trader_Bodyguards(_Trader, _Guard)
+DB_LLFULOOT_Trader_Bodyguards(_Trader, _Guard)
 AND
 GetDistanceTo(_Trader, _Guard, _Dist)
 AND
@@ -723,7 +723,7 @@ StoryEvent((CHARACTERGUID)_Guard, "LLFULOOT_BodyguardArrivedAtTrader_Part2")
 AND
 CharacterIsInCombat(_Guard, 0)
 AND
-DB_LLFULLOOT_Trader_Bodyguards(_Trader, _Guard)
+DB_LLFULOOT_Trader_Bodyguards(_Trader, _Guard)
 AND
 CombatGetIDForCharacter(_Trader, _CombatID)
 AND
@@ -752,7 +752,7 @@ ProcObjectTimerCancel(_Trader, "LLFULOOT_Timers_ResetBodyguards");
 PROC
 ProcObjectTimerFinished((CHARACTERGUID)_Trader, "LLFULOOT_Timers_ResetBodyguards")
 AND
-DB_LLFULLOOT_Trader_Bodyguards(_Trader, _Guard)
+DB_LLFULOOT_Trader_Bodyguards(_Trader, _Guard)
 AND
 ObjectExists(_Guard, 1)
 AND
@@ -760,16 +760,16 @@ CharacterIsInCombat(_Guard, 0)
 THEN
 Poof(_Guard);
 RemoveTemporaryCharacter(_Guard);
-NOT DB_LLFULLOOT_Trader_Bodyguards(_Trader, _Guard);
+NOT DB_LLFULOOT_Trader_Bodyguards(_Trader, _Guard);
 
 PROC
 ProcObjectTimerFinished((CHARACTERGUID)_Trader, "LLFULOOT_Timers_ResetBodyguards")
 AND
-DB_LLFULLOOT_Trader_Bodyguards(_Trader, _Guard)
+DB_LLFULOOT_Trader_Bodyguards(_Trader, _Guard)
 AND
 ObjectExists(_Guard, 0)
 THEN
-NOT DB_LLFULLOOT_Trader_Bodyguards(_Trader, _Guard);
+NOT DB_LLFULOOT_Trader_Bodyguards(_Trader, _Guard);
 //END_REGION
 
 EXITSECTION

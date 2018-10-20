@@ -36,6 +36,8 @@ AND
 CharacterIsPlayer(_Character, 0)
 AND
 CharacterIsSummon(_Character, 0)
+AND
+CharacterIsPartyFollower(_Character, 0)
 THEN
 DB_NOOP(1);
 
@@ -157,9 +159,24 @@ THEN
 NOT DB_LLFULOOT_Temp_TraderBackpack(_Character, _Backpack);
 MoveAllItemsTo(_Backpack, _Character, 1, 1, 0);
 ItemRemove(_Backpack);
-CharacterSetCorpseLootable(_Character, 1);
 DebugBreak("[LLFULOOT:CharacterDied] Moved all items back to character.");
 SetStoryEvent(_Character, "LLFULOOT_LootSet");
+
+IF
+StoryEvent((CHARACTERGUID)_Character, "LLFULOOT_LootSet")
+AND
+IsTagged(_Character, "FullLoot_MakeLootable", 1)
+THEN
+CharacterSetCorpseLootable(_Character, 1);
+
+IF
+StoryEvent((CHARACTERGUID)_Character, "LLFULOOT_LootSet")
+AND
+IsTagged(_Character, "FullLoot_MakeLootable", 0)
+AND
+CharacterCanTrade(_Character, 1)
+THEN
+CharacterSetCorpseLootable(_Character, 1);
 
 IF
 CharacterStatusRemoved(_Character, "DYING", _)

@@ -1578,7 +1578,7 @@
                                                 "TagText" : {
                                                    "handle" : "ls::TranslatedStringRepository::s_HandleUnknown",
                                                    "type" : 28,
-                                                   "value" : "Enable More Difficult Traders - Traders will be beefier, hit harder, and summon \"Shop Guards\" when pulled into combat with a player."
+                                                   "value" : "Enable More Difficult Traders - Traders will be considerably tougher when when pulled into combat with a player."
                                                 },
                                                 "stub" : {"type" : 19, "value" : 1}
                                              }
@@ -2607,7 +2607,7 @@
                                                 "TagText" : {
                                                    "handle" : "ls::TranslatedStringRepository::s_HandleUnknown",
                                                    "type" : 28,
-                                                   "value" : "Enable Trader Guards - When pulled into combat with a player, shop guards will appear to defend the trader."
+                                                   "value" : "Enable Trader Guards - When pulled into combat with a player, bodyguards will appear to defend the trader."
                                                 },
                                                 "stub" : {"type" : 19, "value" : 1}
                                              }
@@ -3585,7 +3585,7 @@
          },
          "editorData" : {
             "needLayout" : {"type" : 19, "value" : 0},
-            "nextNodeId" : {"type" : 5, "value" : 84}
+            "nextNodeId" : {"type" : 5, "value" : 90}
          }
       }
    }
