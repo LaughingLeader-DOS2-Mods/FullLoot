@@ -46,11 +46,13 @@ CharacterStatusAttempt(_Character, "DYING", _)
 AND
 CharacterCanTrade(_Character, 1)
 AND
+IsTagged(_Character, "TRADER", 1)
+AND
 LLFULOOT_QRY_CanFullyLoot(_Character)
 AND
 ObjectGetFlag(_Character, "LLFULOOT_GeneratedTradeTreasure", 0)
 AND
-NOT LLFULOOT_QRY_Trader_GoldValueMeetsMinimum(_Character, 2000) // Only generate if nothing of value is in their inventory
+NOT LLFULOOT_QRY_Trader_TreasureWasGenerated(_Character)
 AND
 GetPosition(_Character, _x, _y, _z)
 AND
@@ -70,7 +72,7 @@ CharacterStatusAttempt(_Character, "DYING", _)
 AND
 DB_GlobalFlag("LLFULOOT_AdjustGoldAmounts")
 AND
-CharacterCanTrade(_Character, 1)
+IsTagged(_Character, "TRADER", 1)
 AND
 LLFULOOT_QRY_CanFullyLoot(_Character)
 THEN
@@ -211,8 +213,6 @@ LLFULOOT_StoreGoldAmount((CHARACTERGUID)_Character)
 AND
 NOT DB_LLFULOOT_Temp_GoldAmount(_Character, _)
 AND
-ObjectGetFlag(_Character, "LLFULOOT_GeneratedTradeTreasure", 1)
-AND
 DB_GlobalFlag("LLFULOOT_GoldReduction_Fourth")
 AND
 CharacterGetGold(_Character, _GoldAmount)
@@ -225,8 +225,6 @@ PROC
 LLFULOOT_StoreGoldAmount((CHARACTERGUID)_Character)
 AND
 NOT DB_LLFULOOT_Temp_GoldAmount(_Character, _)
-AND
-ObjectGetFlag(_Character, "LLFULOOT_GeneratedTradeTreasure", 1)
 AND
 DB_GlobalFlag("LLFULOOT_GoldReduction_Half")
 AND

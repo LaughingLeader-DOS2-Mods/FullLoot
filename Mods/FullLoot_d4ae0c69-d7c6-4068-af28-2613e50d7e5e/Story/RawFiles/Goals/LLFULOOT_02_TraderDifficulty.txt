@@ -43,6 +43,31 @@ DB_LLFULOOT_Trader_GuardPresets(13, "Wizard");
 //END_REGION
 
 //REGION QUERIES
+QRY
+LLFULOOT_QRY_Trader_TreasureWasGenerated((CHARACTERGUID)_Trader)
+AND
+ObjectGetFlag(_Trader, "LLFULOOT_GeneratedTradeTreasure", 1)
+THEN
+DB_NOOP(1);
+
+QRY
+LLFULOOT_QRY_Trader_TreasureWasGenerated((CHARACTERGUID)_Trader)
+AND
+DB_LastTradeItemGeneration(_Trader, _LastTH)
+AND
+_LastTH != 0
+THEN
+DB_NOOP(1);
+
+QRY
+LLFULOOT_QRY_Trader_TreasureWasGenerated((CHARACTERGUID)_Trader)
+AND
+DB_TraderGeneratedTreasureForLevel(_Trader, _Level)
+AND
+_Level != 0
+THEN
+DB_NOOP(1);
+
 //Only spawn bodyguards when there's something worth protecting
 QRY
 LLFULOOT_QRY_Trader_IsValuableTrader((CHARACTERGUID)_Trader, (INTEGER)_MinValue)
@@ -152,30 +177,15 @@ CharacterCanTrade(_Trader, 1)
 THEN
 LLFULOOT_Trader_InitializeInventoryValue(_Trader, _Player);
 
-PROC
-LLFULOOT_Trader_InitializeInventoryValue((CHARACTERGUID)_Trader, (CHARACTERGUID)_Player)
-AND
-DB_GlobalFlag("LLFULOOT_TraderDifficulty_Enabled")
-AND
-ObjectGetFlag(_Trader, "LLFULOOT_GeneratedTradeTreasure", 0)
-AND
-CharacterGetInventoryGoldValue(_Trader, _Value)
-AND
-_Value >= 1000
-THEN
-ObjectSetFlag(_Trader, "LLFULOOT_GeneratedTradeTreasure");
-
 //Since trade items may not be generated yet, force a generation so we can determine the trader's value
 PROC
 LLFULOOT_Trader_InitializeInventoryValue((CHARACTERGUID)_Trader, (CHARACTERGUID)_Player)
 AND
+IsTagged(_Trader, "TRADER", 1)
+AND
 DB_GlobalFlag("LLFULOOT_TraderDifficulty_Enabled")
 AND
-ObjectGetFlag(_Trader, "LLFULOOT_GeneratedTradeTreasure", 0)
-AND
-CharacterGetInventoryGoldValue(_Trader, _Value)
-AND
-_Value < 1000
+NOT LLFULOOT_QRY_Trader_TreasureWasGenerated(_Trader)
 AND
 GetPosition(_Trader, _x, _y, _z)
 AND
@@ -220,6 +230,8 @@ AND
 CharacterIsDead(_Trader, 0)
 AND
 CharacterIsPlayer(_Player, 1)
+AND
+IsTagged(_Trader, "TRADER", 1)
 AND
 LLFULOOT_QRY_Trader_IsValuableTrader(_Trader, 1000)
 THEN

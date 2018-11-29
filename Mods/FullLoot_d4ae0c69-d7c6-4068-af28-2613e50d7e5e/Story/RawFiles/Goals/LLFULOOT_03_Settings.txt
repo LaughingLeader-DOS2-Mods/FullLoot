@@ -100,14 +100,74 @@ QRY_SpeakerIsAvailable(_Host)
 THEN
 Proc_StartDialog(0, "LLFULOOT_SettingsMenu", _Host, _Host);
 
+QRY
+LLFULOOT_QRY_IsIntroLevel("TUT_Tutorial_A")
+THEN
+DB_NOOP(1);
+
+QRY
+LLFULOOT_QRY_IsIntroLevel("FJ_FortJoy_Main")
+THEN
+DB_NOOP(1);
+
 IF
 GameStarted(_Region, _)
 AND
 IsGameLevel(_Region, 1)
 AND
 NOT DB_GlobalFlag("LLFULOOT_InitialSetupComplete")
+AND
+NOT LLFULOOT_QRY_IsIntroLevel(_Region)
 THEN
 TimerLaunch("LLFULOOT_Timers_StartSetupTimer", 1000);
+
+IF
+GameStarted(_Region, _)
+AND
+IsGameLevel(_Region, 1)
+AND
+NOT DB_GlobalFlag("LLFULOOT_InitialSetupComplete")
+AND
+LLFULOOT_QRY_IsIntroLevel(_Region)
+THEN
+TimerCancel("LLFULOOT_Timers_StartSetupTimer");
+TimerLaunch("LLFULOOT_Timers_StartSetupTimer", 10000);
+
+//Tutorial
+PROC
+Proc_TUT_StartGame()
+AND
+NOT DB_GlobalFlag("LLFULOOT_InitialSetupComplete")
+THEN
+TimerCancel("LLFULOOT_Timers_StartSetupTimer");
+
+PROC
+Proc_TUT_CheckPlayersWokenUp((CHARACTERGUID)_Player)
+AND
+DB_CurrentLevel("TUT_Tutorial_A")
+AND
+NOT DB_GlobalFlag("LLFULOOT_InitialSetupComplete")
+THEN
+TimerCancel("LLFULOOT_Timers_StartSetupTimer");
+TimerLaunch("LLFULOOT_Timers_StartSetupTimer", 3500);
+
+//Fort Joy
+PROC
+Proc_FTJ_StartGame()
+AND
+NOT DB_GlobalFlag("LLFULOOT_InitialSetupComplete")
+THEN
+TimerCancel("LLFULOOT_Timers_StartSetupTimer");
+
+PROC
+Proc_FTJ_UnfreezePlayers()
+AND
+DB_CurrentLevel("FJ_FortJoy_Main")
+AND
+NOT DB_GlobalFlag("LLFULOOT_InitialSetupComplete")
+THEN
+TimerCancel("LLFULOOT_Timers_StartSetupTimer");
+TimerLaunch("LLFULOOT_Timers_StartSetupTimer", 3500);
 
 IF
 TimerFinished("LLFULOOT_Timers_StartSetupTimer")
@@ -115,6 +175,8 @@ AND
 CharacterGetHostCharacter(_Host)
 AND
 QRY_SpeakerIsAvailable(_Host)
+AND
+NOT DB_DialogPlayers(_, _Host, _)
 THEN
 DB_LLFULOOT_Temp_SetupStarted(_Host);
 Proc_StartDialog(0, "LLFULOOT_Setup", _Host, _Host);
@@ -124,8 +186,10 @@ IF
 TimerFinished("LLFULOOT_Timers_StartSetupTimer")
 AND
 NOT DB_LLFULOOT_Temp_SetupStarted(_)
+AND
+NOT DB_GlobalFlag("LLFULOOT_InitialSetupComplete")
 THEN
-TimerLaunch("LLFULOOT_Timers_StartSetupTimer", 2000);
+TimerLaunch("LLFULOOT_Timers_StartSetupTimer", 5000);
 
 IF
 DialogEnded("LLFULOOT_Setup", _)
