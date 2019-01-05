@@ -62,6 +62,7 @@ GameStarted(_, 1)
 AND
 GlobalGetFlag("LLFULOOT_SettingsBookAdded", 0)
 THEN
+TimerCancel("LLFULOOT_Timers_Editor_AddSettingsBook");
 TimerLaunch("LLFULOOT_Timers_Editor_AddSettingsBook", 250);
 
 IF

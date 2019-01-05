@@ -1,0 +1,23 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+
+KBSECTION
+
+IF
+TimerFinished("LLFULOOT_Timers_Editor_AddSettingsBook")
+THEN
+CharacterLaunchOsirisOnlyIterator("LLFULOOT_Iterator_SetTraderTag");
+
+IF
+StoryEvent((CHARACTERGUID)_Character, "LLFULOOT_Iterator_SetTraderTag")
+AND
+CharacterIsPlayer(_Character, 0)
+AND
+CharacterCanTrade(_Character, 1)
+THEN
+SetTag(_Character, "TRADER");
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "LLFULOOT_20_Debug"
