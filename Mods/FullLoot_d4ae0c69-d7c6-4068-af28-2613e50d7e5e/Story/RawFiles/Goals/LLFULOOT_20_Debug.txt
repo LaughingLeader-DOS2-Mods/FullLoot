@@ -9,6 +9,25 @@ RegionStarted("_TMPL_Sandbox")
 THEN
 GoalCompleted;
 
+IF
+TextEventSet("loot_findtrader")
+AND
+CharacterGetHostCharacter(_Player)
+THEN
+DB_LLFULOOT_Debug_TeleportPlayer(_Player);
+CharacterLaunchOsirisOnlyIterator("LLFULOOT_Debug_Iterator_FindTrader");
+
+IF
+StoryEvent((CHARACTERGUID)_Character, "LLFULOOT_Debug_Iterator_FindTrader")
+AND
+IsTagged(_Character, "TRADER", 1)
+AND
+LLFULOOT_QRY_Trader_IsValuableTrader(_Character, 3000)
+AND
+DB_LLFULOOT_Debug_TeleportPlayer(_Player)
+THEN
+NOT DB_LLFULOOT_Debug_TeleportPlayer(_Player);
+TeleportTo(_Player, _Character, "", 1, 0, 1);
 EXITSECTION
 
 ENDEXITSECTION

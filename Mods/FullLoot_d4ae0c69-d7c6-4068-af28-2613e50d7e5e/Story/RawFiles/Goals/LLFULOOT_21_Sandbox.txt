@@ -17,6 +17,21 @@ AND
 CharacterCanTrade(_Character, 1)
 THEN
 SetTag(_Character, "TRADER");
+
+IF
+TextEventSet("loot_levelup")
+AND
+GetTextEventParamInteger(1, _Level)
+THEN
+DB_LLFULOOT_Debug_TargetLevel(_Level);
+CharacterLaunchIterator("LLFULOOT_Debug_Iterator_LevelUp");
+
+IF
+StoryEvent((CHARACTERGUID)_Character, "LLFULOOT_Debug_Iterator_LevelUp")
+AND
+DB_LLFULOOT_Debug_TargetLevel(_Level)
+THEN
+CharacterLevelUpTo(_Character, _Level);
 EXITSECTION
 
 ENDEXITSECTION

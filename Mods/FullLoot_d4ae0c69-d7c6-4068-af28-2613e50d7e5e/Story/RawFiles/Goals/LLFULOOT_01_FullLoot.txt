@@ -7,6 +7,7 @@ KBSECTION
 PROC
 LLFULOOT_InitSettings()
 THEN
+SysClear("DB_LLFULOOT_ArmorSlots", 1);
 DB_LLFULOOT_ArmorSlots("Helmet");
 DB_LLFULOOT_ArmorSlots("Breast");
 DB_LLFULOOT_ArmorSlots("Leggings");
@@ -16,12 +17,17 @@ DB_LLFULOOT_ArmorSlots("Gloves");
 DB_LLFULOOT_ArmorSlots("Amulet");
 DB_LLFULOOT_ArmorSlots("Ring");
 DB_LLFULOOT_ArmorSlots("Ring2");
-//DB_LLFULOOT_TemplateBlacklist("EQ_Avatar_LLFULOOT_BeefPower_f26caedf-9509-4687-bcac-1f596060bf57");
+DB_LLFULOOT_TemplateBlacklist("EQ_Avatar_LLFULOOT_BeefPower_f26caedf-9509-4687-bcac-1f596060bf57");
 
 PROC
-LLFULOOT_Updater_VersionUpdated((STRING)_Version, "1.0.3.1")
+LLFULOOT_Updater_VersionUpdated((STRING)_Version, "1.0.4.1")
 THEN
 LLFULOOT_InitSettings();
+
+PROC
+ProcObjectTimerFinished((ITEMGUID)_Item, "LLFULOOT_Timers_RemoveItem")
+THEN
+ItemRemove(_Item);
 
 //REGION TRADE_TREASURE_FLAGS
 IF
@@ -42,6 +48,8 @@ ObjectSetFlag(_Trader, "LLFULOOT_GeneratedTradeTreasure");
 QRY
 LLFULOOT_QRY_CanFullyLoot((CHARACTERGUID)_Character)
 AND
+ObjectExists(_Character, 1)
+AND
 IsTagged(_Character, "LLFULOOT_LootDisabled", 0)
 AND
 NOT DB_IsStoryNpc(_Character)
@@ -53,19 +61,22 @@ AND
 CharacterIsPartyFollower(_Character, 0)
 THEN
 DB_NOOP(1);
-//END_REGION
 
 //REGION DYING
+//Start Event
 IF
-CharacterStatusAttempt(_Character, "DYING", _)
+CharacterPrecogDying(_Character)
 AND
 NOT DB_GlobalFlag("LLFULOOT_LootDisabled")
 AND
-CharacterCanTrade(_Character, 1)
-AND
-IsTagged(_Character, "TRADER", 1)
-AND
 LLFULOOT_QRY_CanFullyLoot(_Character)
+AND
+IsTagged(_Character, "TRADER", _IsTrader)
+THEN
+LLFULOOT_OnCharacterDying(_Character, _IsTrader);
+
+PROC
+LLFULOOT_OnCharacterDying((CHARACTERGUID)_Character, 1)
 AND
 ObjectGetFlag(_Character, "LLFULOOT_GeneratedTradeTreasure", 0)
 AND
@@ -90,27 +101,17 @@ AND
 ItemGetOwner(_Backpack, _Character)
 THEN
 MoveAllItemsTo(_Backpack, _Character, 0, 0, 0);
-ProcObjectTimer(_Backpack, "LLFULOOT_Timers_DeleteBackpack", 250);
+ProcObjectTimer(_Backpack, "LLFULOOT_Timers_RemoveItem", 250);
 
-IF
-CharacterStatusAttempt(_Character, "DYING", _)
-AND
-NOT DB_GlobalFlag("LLFULOOT_LootDisabled")
+PROC
+LLFULOOT_OnCharacterDying((CHARACTERGUID)_Character, 1)
 AND
 DB_GlobalFlag("LLFULOOT_AdjustGoldAmounts")
-AND
-IsTagged(_Character, "TRADER", 1)
-AND
-LLFULOOT_QRY_CanFullyLoot(_Character)
 THEN
 LLFULOOT_StoreGoldAmount(_Character);
 
-IF
-CharacterStatusAttempt(_Character, "DYING", _)
-AND
-NOT DB_GlobalFlag("LLFULOOT_LootDisabled")
-AND
-LLFULOOT_QRY_CanFullyLoot(_Character)
+PROC
+LLFULOOT_OnCharacterDying((CHARACTERGUID)_Character, (INTEGER)_IsTrader)
 AND
 GlobalGetFlag("LLFULOOT_EquippedArmorLootable", _Armor)
 AND
@@ -134,6 +135,10 @@ AND
 CharacterGetEquippedItem(_Character, _Slot, (ITEMGUID)_Item)
 AND
 _Item != NULL_00000000-0000-0000-0000-000000000000
+AND
+ObjectExists(_Item, 1)
+AND
+ItemIsEquipable(_Item, 1)
 THEN
 //CharacterUnequipItem(_Character, _Item);
 ItemToInventory(_Item, _Backpack);
@@ -144,6 +149,10 @@ AND
 CharacterGetEquippedItem(_Character, "Weapon", (ITEMGUID)_Item)
 AND
 _Item != NULL_00000000-0000-0000-0000-000000000000
+AND
+ObjectExists(_Item, 1)
+AND
+ItemIsEquipable(_Item, 1)
 THEN
 //CharacterUnequipItem(_Character, _Item);
 ItemToInventory(_Item, _Backpack);
@@ -154,35 +163,43 @@ AND
 CharacterGetEquippedItem(_Character, "Shield", (ITEMGUID)_Item)
 AND
 _Item != NULL_00000000-0000-0000-0000-000000000000
+AND
+ObjectExists(_Item, 1)
+AND
+ItemIsEquipable(_Item, 1)
 THEN
-CharacterUnequipItem(_Character, _Item);
+//CharacterUnequipItem(_Character, _Item);
 ItemToInventory(_Item, _Backpack);
 
 IF
 ItemAddedToContainer(_Item, _Backpack)
 AND
-DB_LLFULOOT_Temp_TraderBackpack(_Character, _Backpack)
+GetTemplate(_Backpack, "S_LLFULOOT_InvisibleBackpack_394d4e05-b258-4b3f-a78b-eff97a25b231")
+AND
+ObjectExists(_Item, 1)
 AND
 GetTemplate(_Item, _Template)
 AND
-StringContains(_Template, "EQ_Avatar", 1)
+DB_LLFULOOT_TemplateBlacklist(_Template)
 THEN
-ItemRemove(_Item);
+ItemDestroy(_Item);
+DebugBreak("[FullLoot] Destroyed blacklisted item.");
 
 IF
 ItemAddedToContainer(_Item, _Backpack)
 AND
-DB_LLFULOOT_Temp_TraderBackpack(_Character, _Backpack)
+GetTemplate(_Backpack, "S_LLFULOOT_InvisibleBackpack_394d4e05-b258-4b3f-a78b-eff97a25b231")
 AND
-SysCount("DB_LLFULOOT_TemplateBlacklist", 1, _Count)
+ObjectExists(_Item, _x1)
 AND
-_Count > 0
+ItemIsDestroyed(_Item, _x2)
 AND
-GetTemplate(_Item, _Template)
+IntegerSubtract(_x1, _x2, _r)
 AND
-DB_LLFULOOT_TemplateBlacklist((STRING)_Template)
+_r <= 0 // Doesn't exist or is destroyed
 THEN
 ItemRemove(_Item);
+DebugBreak("[FullLoot] Removed item.");
 
 QRY
 LLFULOOT_QRY_EitherCharacterIsAPlayer((CHARACTERGUID)_Owner, (CHARACTERGUID)_Attacker)
@@ -222,15 +239,10 @@ AND
 DB_LLFULOOT_Temp_TraderBackpack(_Character, _Backpack)
 THEN
 NOT DB_LLFULOOT_Temp_TraderBackpack(_Character, _Backpack);
-MoveAllItemsTo(_Backpack, _Character, 1, 1, 0);
-ProcObjectTimer(_Backpack, "LLFULOOT_Timers_DeleteBackpack", 250);
+MoveAllItemsTo(_Backpack, _Character, 0, 0, 0);
+ProcObjectTimer(_Backpack, "LLFULOOT_Timers_RemoveItem", 250);
 DebugBreak("[LLFULOOT:CharacterDied] Moved all items back to character.");
 SetStoryEvent(_Character, "LLFULOOT_LootSet");
-
-PROC
-ProcObjectTimerFinished((ITEMGUID)_Backpack, "LLFULOOT_Timers_DeleteBackpack")
-THEN
-ItemRemove(_Backpack);
 
 IF
 StoryEvent((CHARACTERGUID)_Character, "LLFULOOT_LootSet")
@@ -257,8 +269,8 @@ DB_LLFULOOT_Temp_TraderBackpack(_Character, _Backpack)
 THEN
 DebugBreak("[LLFULOOT:CharacterStatusRemoved(DYING)] Character didn't die. Moving items back and removing backpack.");
 NOT DB_LLFULOOT_Temp_TraderBackpack(_Character, _Backpack);
-MoveAllItemsTo(_Backpack, _Character, 1, 1, 0);
-ProcObjectTimer(_Backpack, "LLFULOOT_Timers_DeleteBackpack", 250);
+MoveAllItemsTo(_Backpack, _Character, 0, 0, 0);
+ProcObjectTimer(_Backpack, "LLFULOOT_Timers_RemoveItem", 250);
 SetStoryEvent(_Character, "LLFULOOT_FullLootCancelled");
 
 IF
@@ -267,7 +279,9 @@ AND
 DB_LLFULOOT_Temp_GoldAmount(_Character, _SetAmount)
 THEN
 NOT DB_LLFULOOT_Temp_GoldAmount(_Character, _SetAmount);
+//END_REGION
 
+//REGION GOLD
 IF
 StoryEvent((CHARACTERGUID)_Character, "LLFULOOT_LootSet")
 AND
@@ -307,6 +321,7 @@ LLFULOOT_RemoveGold((CHARACTERGUID)_Character)
 AND
 GetItemForItemTemplateInInventory(_Character, "LOOT_Gold_A_1c3c9c74-34a1-4685-989e-410dc080be6f", _Gold)
 THEN
+//ProcObjectTimer(_Gold, "LLFULOOT_Timers_RemoveItem", 25);
 ItemRemove(_Gold);
 DebugBreak("[LLFULOOT:RemoveGold] Removed gold root template from character.");
 
@@ -328,6 +343,7 @@ THEN
 NOT DB_LLFULOOT_Temp_GoldAmount(_Character, _SetAmount);
 CharacterAddGold(_Character, _SetAmount);
 DebugBreak("[LLFULOOT:AdjustGold] Added a reduced amount of previous gold to trader.");
+//END_REGION
 EXITSECTION
 
 ENDEXITSECTION

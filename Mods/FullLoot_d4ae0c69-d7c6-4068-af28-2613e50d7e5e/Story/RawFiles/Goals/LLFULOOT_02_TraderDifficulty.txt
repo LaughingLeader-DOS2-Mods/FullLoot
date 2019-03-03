@@ -42,6 +42,26 @@ DB_LLFULOOT_Trader_GuardPresets(12, "Witch");
 DB_LLFULOOT_Trader_GuardPresets(13, "Wizard");
 //END_REGION
 
+//REGION OBJECT_ENTERED_COMBAT
+IF
+ObjectEnteredCombat(_Character, _CombatID)
+AND
+DB_GlobalFlag("LLFULOOT_TraderDifficulty_Enabled")
+AND
+ObjectExists(_Character, 1)
+AND
+ObjectIsCharacter((CHARACTERGUID)_Character, 1)
+AND
+NOT DB_IsPlayer(_Character)
+THEN
+LLFULOOT_Trader_CharacterEnteredCombat(_Character, _CombatID);
+
+PROC
+LLFULOOT_Trader_CharacterEnteredCombat((CHARACTERGUID)_Character, (INTEGER)_CombatID)
+THEN
+DB_NOOP(1);
+//END_REGION
+
 //REGION QUERIES
 QRY
 LLFULOOT_QRY_Trader_TreasureWasGenerated((CHARACTERGUID)_Trader)
@@ -114,12 +134,12 @@ DB_NOOP(1);
 //END_REGION
 
 //REGION BEEF_MODE
-IF
-ObjectEnteredCombat((CHARACTERGUID)_Trader, _CombatID)
-AND
-DB_GlobalFlag("LLFULOOT_TraderDifficulty_Enabled")
+PROC
+LLFULOOT_Trader_CharacterEnteredCombat((CHARACTERGUID)_Trader, (INTEGER)_CombatID)
 AND
 DB_GlobalFlag("LLFULOOT_TraderDifficulty_StrongerTraders")
+AND
+IsTagged(_Trader, "TRADER", 1)
 AND
 LLFULOOT_QRY_Trader_IsValuableTrader(_Trader, 250)
 AND
@@ -154,8 +174,8 @@ RemoveStatus(_Trader, "LLFULOOT_TRADER_BEEF_MODE");
 //END_REGION
 
 //REGION TRADER_VALUE
-IF
-ObjectEnteredCombat((CHARACTERGUID)_Trader, _CombatID)
+PROC
+LLFULOOT_Trader_CharacterEnteredCombat((CHARACTERGUID)_Trader, (INTEGER)_CombatID)
 AND
 CharacterCanTrade(_Trader, 1)
 AND
@@ -166,7 +186,11 @@ THEN
 LLFULOOT_Trader_InitializeInventoryValue(_Trader, _Player);
 
 IF
-CharacterStartAttackObject((CHARACTERGUID)_Trader, (CHARACTERGUID)_Player, _)
+CharacterStartAttackObject(_Trader, (CHARACTERGUID)_Player, _)
+AND
+DB_GlobalFlag("LLFULOOT_TraderDifficulty_Enabled")
+AND
+ObjectIsCharacter((CHARACTERGUID)_Trader, 1)
 //AttackedByObject((CHARACTERGUID)_Trader, (CHARACTERGUID)_Player, _, _, _)
 AND
 ObjectGetFlag(_Trader, "LLFULOOT_GeneratedTradeTreasure", 0)
@@ -183,8 +207,6 @@ LLFULOOT_Trader_InitializeInventoryValue((CHARACTERGUID)_Trader, (CHARACTERGUID)
 AND
 IsTagged(_Trader, "TRADER", 1)
 AND
-DB_GlobalFlag("LLFULOOT_TraderDifficulty_Enabled")
-AND
 NOT LLFULOOT_QRY_Trader_TreasureWasGenerated(_Trader)
 AND
 GetPosition(_Trader, _x, _y, _z)
@@ -193,7 +215,7 @@ CreateItemTemplateAtPosition("S_LLFULOOT_InvisibleBackpack_394d4e05-b258-4b3f-a7
 THEN
 DB_LLFULOOT_Trader_Temp_GeneratingItems(_Trader, _Player, _Backpack);
 MoveAllItemsTo(_Trader, _Backpack, 0, 0, 0);
-ProcObjectTimer(_Trader, "LLFULOOT_Timers_ItemsMoved_GenerateItems", 50);
+ProcObjectTimer(_Trader, "LLFULOOT_Timers_ItemsMoved_GenerateItems", 150);
 
 PROC
 ProcObjectTimerFinished((CHARACTERGUID)_Trader, "LLFULOOT_Timers_ItemsMoved_GenerateItems")
@@ -202,26 +224,25 @@ DB_LLFULOOT_Trader_Temp_GeneratingItems(_Trader, _Player, _Backpack)
 THEN
 ObjectSetFlag(_Trader, "LLFULOOT_GeneratedTradeTreasure");
 GenerateItems(_Player, _Trader);
-ProcObjectTimer(_Trader, "LLFULOOT_Timers_GenerateItems_MoveItemsBack", 25);
+ProcObjectTimer(_Trader, "LLFULOOT_Timers_GenerateItems_MoveItemsBack", 200);
 
 PROC
-ProcObjectTimerFinished((CHARACTERGUID)_Trader, "LLFULOOT_Timers_ItemsMoved_GenerateItems")
+ProcObjectTimerFinished((CHARACTERGUID)_Trader, "LLFULOOT_Timers_GenerateItems_MoveItemsBack")
 AND
 DB_LLFULOOT_Trader_Temp_GeneratingItems(_Trader, _Player, _Backpack)
 THEN
 NOT DB_LLFULOOT_Trader_Temp_GeneratingItems(_Trader, _Player, _Backpack);
 MoveAllItemsTo(_Backpack, _Trader, 0, 0, 0);
-ProcObjectTimer(_Backpack, "LLFULOOT_Timers_DestroyInvisibleBackpack", 100);
-
-PROC
-ProcObjectTimerFinished((ITEMGUID)_Backpack, "LLFULOOT_Timers_DestroyInvisibleBackpack")
-THEN
-ItemRemove(_Backpack);
+ProcObjectTimer(_Backpack, "LLFULOOT_Timers_RemoveItem", 250);
 //END_REGION
 
 //REGION BODYGUARD_SPAWNING
 IF
 AttackedByObject((CHARACTERGUID)_Trader, (CHARACTERGUID)_Player, _, _, _)
+AND
+DB_GlobalFlag("LLFULOOT_TraderDifficulty_Enabled")
+AND
+DB_GlobalFlag("LLFULOOT_TraderDifficulty_SpawnGuards")
 AND
 ObjectGetFlag(_Trader, "LLFULOOT_SpawnedGuards", 0)
 AND
@@ -255,8 +276,8 @@ CharacterIsInCombat(_Trader, 1)
 THEN
 LLFULOOT_Trader_Internal_GuardSpawnCheck(_Trader);
 
-IF
-ObjectEnteredCombat((CHARACTERGUID)_Trader, _CombatID)
+PROC
+LLFULOOT_Trader_CharacterEnteredCombat((CHARACTERGUID)_Trader, (INTEGER)_CombatID)
 AND
 ObjectGetFlag(_Trader, "LLFULOOT_CanSpawnGuards", 1) // Only traders attacked by players
 AND
@@ -586,12 +607,12 @@ THEN
 NOT DB_LLFULOOT_Trader_Temp_GuardCombat(_Trader, _Guard, _Player, _CombatID);
 SetTag(_Guard, "LLFULOOT_LootDisabled");
 EnterCombat(_Guard, _Player);
-JumpToTurn(_Guard);
+//JumpToTurn(_Guard);
 DebugBreak("[LLFULOOT:Trader:StoryEvent('GuardAppeared')] Trader guard entered combat.");
 
 //The status attempt seems to fire before CharacterDying, which ultimately prevents an empty backpack from being dropped.
 IF
-CharacterStatusAttempt(_Guard, "DYING", _)
+CharacterPrecogDying(_Guard)
 AND
 IsTagged(_Guard, "LLFULOOT_TraderGuard", 1)
 AND
@@ -600,7 +621,7 @@ AND
 CreateItemTemplateAtPosition("S_LLFULOOT_InvisibleBackpack_394d4e05-b258-4b3f-a78b-eff97a25b231", _x, _y, _z, _Backpack)
 THEN
 MoveAllItemsTo(_Guard, _Backpack, 0, 0, 0);
-ItemRemove(_Backpack);
+ProcObjectTimer(_Backpack, "LLFULOOT_Timers_RemoveItem", 200);
 
 IF
 CharacterDied(_Guard)
@@ -660,8 +681,8 @@ DB_LLFULOOT_Trader_Temp_TraderMurderer(_Guard, _Trader, _Murderer)
 THEN
 NOT DB_LLFULOOT_Trader_Temp_TraderMurderer(_Guard, _Trader, _Murderer);
 
-IF
-ObjectEnteredCombat((CHARACTERGUID)_Guard, _CombatID)
+PROC
+LLFULOOT_Trader_CharacterEnteredCombat((CHARACTERGUID)_Guard, (INTEGER)_CombatID)
 AND
 DB_LLFULOOT_Trader_Temp_TraderMurderer(_Guard, _Trader, _Murderer)
 AND
@@ -683,14 +704,16 @@ CharacterIsInCombat(_Trader, 0)
 THEN
 ProcCharacterFollowCharacter(_Guard, _Trader);
 
-IF
-ObjectEnteredCombat((CHARACTERGUID)_Guard, _CombatID)
+/*
+PROC
+LLFULOOT_Trader_CharacterEnteredCombat((CHARACTERGUID)_Guard, (INTEGER)_CombatID)
 AND
 DB_LLFULOOT_Trader_Bodyguards(_Trader, _Guard)
 AND
 DB_Following(_Guard, _Trader)
 THEN
 ProcCharacterStopFollow(_Guard);
+*/
 //END_REGION
 
 //REGION BODYGUARD_RESET
@@ -703,8 +726,8 @@ ObjectGetFlag(_Trader, "LLFULOOT_SpawnedGuards", 1)
 THEN
 ProcObjectTimer(_Trader, "LLFULOOT_Timers_ResetBodyguards", 300000); // 5 minutes
 
-IF
-ObjectEnteredCombat((CHARACTERGUID)_Trader, _CombatID)
+PROC
+LLFULOOT_Trader_CharacterEnteredCombat((CHARACTERGUID)_Trader, (INTEGER)_CombatID)
 AND
 DB_ObjectTimer(_Trader, _ObjectTimerName, "LLFULOOT_Timers_ResetBodyguards")
 AND
@@ -716,8 +739,8 @@ _Dist < 20
 THEN
 SetStoryEvent(_Guard, "LLFULOOT_BodyguardArrivedAtTrader_Part2");
 
-IF
-ObjectEnteredCombat((CHARACTERGUID)_Trader, _CombatID)
+PROC
+LLFULOOT_Trader_CharacterEnteredCombat((CHARACTERGUID)_Trader, (INTEGER)_CombatID)
 AND
 DB_ObjectTimer(_Trader, _ObjectTimerName, "LLFULOOT_Timers_ResetBodyguards")
 AND
@@ -754,8 +777,8 @@ StoryEvent((CHARACTERGUID)_Guard, "LLFULOOT_BodyguardArrivedAtTrader_Part2")
 THEN
 ProcObjectTimer(_Guard, "LLFULOOT_Timers_DisplayGuardText", 500);
 
-IF
-ObjectEnteredCombat((CHARACTERGUID)_Trader, _CombatID)
+PROC
+LLFULOOT_Trader_CharacterEnteredCombat((CHARACTERGUID)_Trader, (INTEGER)_CombatID)
 AND
 DB_ObjectTimer(_Trader, _ObjectTimerName, "LLFULOOT_Timers_ResetBodyguards")
 THEN
