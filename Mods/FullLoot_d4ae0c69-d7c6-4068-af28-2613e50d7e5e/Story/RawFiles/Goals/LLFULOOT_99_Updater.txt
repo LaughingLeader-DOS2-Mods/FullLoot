@@ -9,15 +9,15 @@ GameStarted(_Level, _)
 AND
 IsGameLevel(_Level, 1)
 AND
-LLFULOOT_Updater_QRY_UpdateNeeded("1.0.4.1")
+LLFULOOT_Updater_QRY_UpdateNeeded("1.0.4.3")
 THEN
 LLFULOOT_Internal_RegisterMod();
 
 PROC
 LLFULOOT_Internal_RegisterMod()
 THEN
-LLFULOOT_Updater_RemoveOldVersions("1.0.4.1");
-LLFULOOT_Updater_SetVersion("1.0.4.1");
+LLFULOOT_Updater_RemoveOldVersions("1.0.4.3");
+LLFULOOT_Updater_SetVersion("1.0.4.3");
 
 QRY
 LLFULOOT_Updater_QRY_UpdateNeeded((STRING)_Version)

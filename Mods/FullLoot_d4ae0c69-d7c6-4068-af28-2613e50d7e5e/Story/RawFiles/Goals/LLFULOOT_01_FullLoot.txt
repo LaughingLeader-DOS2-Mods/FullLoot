@@ -20,7 +20,7 @@ DB_LLFULOOT_ArmorSlots("Ring2");
 DB_LLFULOOT_TemplateBlacklist("EQ_Avatar_LLFULOOT_BeefPower_f26caedf-9509-4687-bcac-1f596060bf57");
 
 PROC
-LLFULOOT_Updater_VersionUpdated((STRING)_Version, "1.0.4.1")
+LLFULOOT_Updater_VersionUpdated((STRING)_Version, "1.0.4.3")
 THEN
 LLFULOOT_InitSettings();
 
