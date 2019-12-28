@@ -1,7 +1,9 @@
 Version 1
 SubGoalCombiner SGC_AND
 INITSECTION
-
+//Initial settings
+GlobalSetFlag("LLFULOOT_AdjustGoldAmounts");
+GlobalSetFlag("LLFULOOT_GoldReduction_Fourth");
 KBSECTION
 IF
 DialogStarted("LLFULOOT_SettingsMenu", _Instance)
@@ -43,6 +45,8 @@ ItemTemplateAddTo("BOOK_LLFULOOT_SettingsMenu_7056c5bd-5d3a-44c3-8511-df02f6464c
 IF
 GameStarted(_Region, _)
 AND
+GlobalGetFlag("LeaderLib_AutoAddModMenuBooksDisabled", 0)
+AND
 IsGameLevel(_Region, 1)
 AND
 GlobalGetFlag("LLFULOOT_SettingsBookAdded", 0)
@@ -53,12 +57,11 @@ ItemTemplateIsInPartyInventory(_Host, "BOOK_LLFULOOT_SettingsMenu_7056c5bd-5d3a-
 THEN
 GlobalSetFlag("LLFULOOT_SettingsBookAdded");
 ItemTemplateAddTo("BOOK_LLFULOOT_SettingsMenu_7056c5bd-5d3a-44c3-8511-df02f6464ccf", _Host, 1, 0);
-//Initial settings
-GlobalSetFlag("LLFULOOT_AdjustGoldAmounts");
-GlobalSetFlag("LLFULOOT_GoldReduction_Fourth");
 
 IF
 GameStarted(_, 1)
+AND
+GlobalGetFlag("LeaderLib_AutoAddModMenuBooksDisabled", 0)
 AND
 GlobalGetFlag("LLFULOOT_SettingsBookAdded", 0)
 THEN
@@ -67,8 +70,6 @@ TimerLaunch("LLFULOOT_Timers_Editor_AddSettingsBook", 250);
 
 IF
 TimerFinished("LLFULOOT_Timers_Editor_AddSettingsBook")
-AND
-GlobalGetFlag("LLFULOOT_SettingsBookAdded", 0)
 AND
 CharacterGetHostCharacter(_Host)
 AND
@@ -206,6 +207,7 @@ AND
 NOT DB_GlobalFlag("LLFULOOT_AdjustGoldAmounts")
 THEN
 GlobalSetFlag("LLFULOOT_AdjustGoldAmounts");
+LLFULOOT_SaveGlobalSettings();
 
 IF
 GlobalFlagSet("LLFULOOT_GoldReduction_Half")
@@ -213,6 +215,7 @@ AND
 NOT DB_GlobalFlag("LLFULOOT_AdjustGoldAmounts")
 THEN
 GlobalSetFlag("LLFULOOT_AdjustGoldAmounts");
+LLFULOOT_SaveGlobalSettings();
 
 IF
 GlobalFlagCleared("LLFULOOT_GoldReduction_Fourth")
@@ -220,13 +223,15 @@ AND
 NOT DB_GlobalFlag("LLFULOOT_GoldReduction_Half")
 THEN
 GlobalClearFlag("LLFULOOT_AdjustGoldAmounts");
+LLFULOOT_SaveGlobalSettings();
 
 IF
-GlobalFlagSet("LLFULOOT_GoldReduction_Half")
+GlobalFlagCleared("LLFULOOT_GoldReduction_Half")
 AND
 NOT DB_GlobalFlag("LLFULOOT_GoldReduction_Fourth")
 THEN
 GlobalClearFlag("LLFULOOT_AdjustGoldAmounts");
+LLFULOOT_SaveGlobalSettings();
 
 IF
 GlobalFlagSet("LLFULOOT_TraderDifficulty_StrongerTraders")
@@ -234,6 +239,7 @@ AND
 NOT DB_GlobalFlag("LLFULOOT_TraderDifficulty_Enabled")
 THEN
 GlobalSetFlag("LLFULOOT_TraderDifficulty_Enabled");
+LLFULOOT_SaveGlobalSettings();
 
 IF
 GlobalFlagSet("LLFULOOT_TraderDifficulty_SpawnGuards")
@@ -241,6 +247,7 @@ AND
 NOT DB_GlobalFlag("LLFULOOT_TraderDifficulty_Enabled")
 THEN
 GlobalSetFlag("LLFULOOT_TraderDifficulty_Enabled");
+LLFULOOT_SaveGlobalSettings();
 
 IF
 GlobalFlagCleared("LLFULOOT_TraderDifficulty_StrongerTraders")
@@ -248,6 +255,7 @@ AND
 NOT DB_GlobalFlag("LLFULOOT_TraderDifficulty_SpawnGuards")
 THEN
 GlobalClearFlag("LLFULOOT_TraderDifficulty_Enabled");
+LLFULOOT_SaveGlobalSettings();
 
 IF
 GlobalFlagCleared("LLFULOOT_TraderDifficulty_SpawnGuards")
@@ -255,6 +263,7 @@ AND
 NOT DB_GlobalFlag("LLFULOOT_TraderDifficulty_StrongerTraders")
 THEN
 GlobalClearFlag("LLFULOOT_TraderDifficulty_Enabled");
+LLFULOOT_SaveGlobalSettings();
 //END_REGION
 
 //REGION DEBUG
