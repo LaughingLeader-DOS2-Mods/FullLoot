@@ -4,6 +4,8 @@
 	<content contentuid="hc478a6b9g8addg41e4g9247g8ec5bbd18b35" Source="LLFULOOT_DisplayText.lsb" Key="LLFULOOT_GuardAppeared_Line2">Stop, thief! </content>
 	<content contentuid="h403793b9g40d7g4bd9g9080g1e7bb2b4d975" Source="LLFULOOT_DisplayText.lsb" Key="LLFULOOT_GuardAppeared_Line3">Mugger! Die!</content>
 	<content contentuid="h000de04ega82fg4fb4g8680g22a35f2ef5d2" Source="LLFULOOT_DisplayText.lsb" Key="LLFULOOT_GuardAppeared_Line4">Never should have come here!</content>
+	<content contentuid="h72f75e22gdd9dg4f77ga395gb5839caa93a8" Source="LLFULOOT_DisplayText.lsb" Key="LLFULOOT_Mod_Description">Makes all characters fully lootable (including trade items), with optional settings to enable looting armor, weapons, and rebalancing gold dropped from traders. Additionally, full loot can be enabled for PVP.</content>
+	<content contentuid="h5c1600f9g88b8g4924gb4e1g41d4194e3a08" Source="LLFULOOT_DisplayText.lsb" Key="LLFULOOT_Mod_DisplayName">Full Loot</content>
 	<content contentuid="hf0de36dfgfe83g4232g99d2g475ddf60886a" Source="LLFULOOT_Potions.lsb" Key="LLFULOOT_TRADER_BEEF_MODE_Description">Trader is more difficult after being attacked by the party.</content>
 	<content contentuid="hfa469398g25a7g4677g9a11g32a16ace04d7" Source="LLFULOOT_Potions.lsb" Key="Stats_LLFULOOT_TraderBeefMode">Increased Trader Difficulty</content>
 	<content contentuid="h8c522e64ge5dbg4a52gab71g3f95ccff7532" Source="LLFULOOT_SettingsMenu.lsj">Disable Trader Guards</content>

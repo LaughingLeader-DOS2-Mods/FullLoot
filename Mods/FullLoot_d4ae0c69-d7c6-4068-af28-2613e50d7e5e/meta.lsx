@@ -10,8 +10,8 @@
                     <attribute id="Author" value="LaughingLeader" type="30" />
                     <attribute id="CharacterCreationLevelName" value="" type="22" />
                     <attribute id="Description" value="Makes all characters fully lootable (including trade items), with optional settings to enable looting armor, weapons, and rebalancing gold dropped from traders. Additionally, full loot can be enabled for PVP." type="30" />
-                    <attribute id="DescriptionName" value="" handle="ls::TranslatedStringRepository::s_HandleUnknown" type="28" />
-                    <attribute id="DisplayName" value="" handle="ls::TranslatedStringRepository::s_HandleUnknown" type="28" />
+                    <attribute id="DescriptionName" value="LLFULOOT_Mod_Description" handle="h72f75e22gdd9dg4f77ga395gb5839caa93a8" type="28" />
+                    <attribute id="DisplayName" value="LLFULOOT_Mod_DisplayName" handle="h5c1600f9g88b8g4924gb4e1g41d4194e3a08" type="28" />
                     <attribute id="Folder" value="FullLoot_d4ae0c69-d7c6-4068-af28-2613e50d7e5e" type="30" />
                     <attribute id="GMTemplate" value="" type="22" />
                     <attribute id="LobbyLevelName" value="" type="22" />
@@ -27,7 +27,7 @@
                     <attribute id="Version" value="285212672" type="4" />
                     <children>
                         <node id="PublishVersion">
-                            <attribute id="Version" value="908338577" type="4" />
+                            <attribute id="Version" value="909321303" type="4" />
                         </node>
                         <node id="Scripts">
                             <children>
