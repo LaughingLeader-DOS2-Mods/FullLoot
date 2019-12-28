@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <save>
     <header version="2" />
-    <version major="3" minor="6" revision="3" build="1" />
+    <version major="3" minor="6" revision="6" build="0" />
     <region id="Config">
         <node id="root">
             <children>
@@ -10,6 +10,8 @@
                     <attribute id="Author" value="LaughingLeader" type="30" />
                     <attribute id="CharacterCreationLevelName" value="" type="22" />
                     <attribute id="Description" value="Makes all characters fully lootable (including trade items), with optional settings to enable looting armor, weapons, and rebalancing gold dropped from traders. Additionally, full loot can be enabled for PVP." type="30" />
+                    <attribute id="DescriptionName" value="" handle="ls::TranslatedStringRepository::s_HandleUnknown" type="28" />
+                    <attribute id="DisplayName" value="" handle="ls::TranslatedStringRepository::s_HandleUnknown" type="28" />
                     <attribute id="Folder" value="FullLoot_d4ae0c69-d7c6-4068-af28-2613e50d7e5e" type="30" />
                     <attribute id="GMTemplate" value="" type="22" />
                     <attribute id="LobbyLevelName" value="" type="22" />
@@ -22,7 +24,7 @@
                     <attribute id="Tags" value="" type="30" />
                     <attribute id="Type" value="Add-on" type="22" />
                     <attribute id="UUID" value="d4ae0c69-d7c6-4068-af28-2613e50d7e5e" type="22" />
-                    <attribute id="Version" value="268697603" type="4" />
+                    <attribute id="Version" value="285212672" type="4" />
                     <children>
                         <node id="PublishVersion">
                             <attribute id="Version" value="908338577" type="4" />
@@ -49,6 +51,9 @@
                             <children>
                                 <node id="Target">
                                     <attribute id="Object" value="Story" type="22" />
+                                </node>
+                                <node id="Target">
+                                    <attribute id="Object" value="GM" type="22" />
                                 </node>
                             </children>
                         </node>

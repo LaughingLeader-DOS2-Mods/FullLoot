@@ -9,15 +9,15 @@ GameStarted(_Level, _)
 AND
 IsGameLevel(_Level, 1)
 AND
-LLFULOOT_Updater_QRY_UpdateNeeded("1.0.5.0")
+LLFULOOT_Updater_QRY_UpdateNeeded("1.1.0.0")
 THEN
 LLFULOOT_Internal_RegisterMod();
 
 PROC
 LLFULOOT_Internal_RegisterMod()
 THEN
-LLFULOOT_Updater_RemoveOldVersions("1.0.5.0");
-LLFULOOT_Updater_SetVersion("1.0.5.0");
+LLFULOOT_Updater_RemoveOldVersions("1.1.0.0");
+LLFULOOT_Updater_SetVersion("1.1.0.0");
 
 QRY
 LLFULOOT_Updater_QRY_UpdateNeeded((STRING)_Version)
@@ -73,11 +73,6 @@ DB_LeaderLib_Treasure_ItemMaxAmount("LeaderLib.LeaderTrader.ModBooks", "BOOK_LLF
 //END_REGION
 
 //REGION LEADERLIB_GLOBAL_SETTINGS
-IF
-GlobalFlagSet("LLFULOOT_InitialSetupComplete")
-THEN
-LLFULOOT_SaveGlobalSettings();
-
 IF
 GlobalFlagSet("LLFULOOT_SaveGlobalSettings")
 THEN
