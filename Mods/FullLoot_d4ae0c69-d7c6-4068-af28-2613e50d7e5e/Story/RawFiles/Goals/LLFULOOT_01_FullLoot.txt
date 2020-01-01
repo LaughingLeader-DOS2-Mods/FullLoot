@@ -89,11 +89,17 @@ AND
 CreateItemTemplateAtPosition("S_LLFULOOT_InvisibleBackpack_394d4e05-b258-4b3f-a78b-eff97a25b231", _x, _y, _z, _Backpack)
 THEN
 ObjectSetFlag(_Character, "LLFULOOT_GeneratedTradeTreasure");
-MoveAllItemsTo(_Character, _Backpack, 0, 0, 0);
+//MoveAllItemsTo(_Character, _Backpack, 0, 0, 0);
 GenerateItems(_Host, _Character);
 ItemSetOwner(_Backpack, _Character);
+ProcObjectTimer(_Character, "LLFULOOT_Timers_MoveItemsToBackpack_Start", 25); // Delay for generatio
 DebugBreak("[LLFULOOT:CharacterStatusAttempt(DYING)] Trader never generated items. Forced a trade generation.");
 ProcObjectTimer(_Backpack, "LLFULOOT_Timers_MoveItemsBackToOwner", 250);
+
+PROC
+ProcObjectTimerFinished((ITEMGUID)_Character, "LLFULOOT_Timers_MoveItemsToBackpack_Start")
+THEN
+InventoryLaunchIterator(_Character, "LLFULOOT_Iterator_MoveItemToBackpack", "");
 
 PROC
 ProcObjectTimerFinished((ITEMGUID)_Backpack, "LLFULOOT_Timers_MoveItemsBackToOwner")
@@ -123,9 +129,28 @@ CreateItemTemplateAtPosition("S_LLFULOOT_InvisibleBackpack_394d4e05-b258-4b3f-a7
 THEN
 LLFULOOT_MoveArmor(_Character, _Backpack, _Armor);
 LLFULOOT_MoveWeapons(_Character, _Backpack, _Weapons);
-MoveAllItemsTo(_Character, _Backpack, 0, 0, 0);
-DebugBreak("[LLFULOOT:CharacterStatusAttempt(DYING)] Moved all items to a backpack.");
 DB_LLFULOOT_Temp_TraderBackpack(_Character, _Backpack);
+//MoveAllItemsTo(_Character, _Backpack, 0, 0, 0);
+InventoryLaunchIterator(_Character, "LLFULOOT_Iterator_MoveItemToBackpack", "");
+DebugBreak("[LLFULOOT:CharacterStatusAttempt(DYING)] Moved all items to a backpack.");
+
+IF
+StoryEvent((ITEMGUID)_Item, "LLFULOOT_Iterator_MoveItemToBackpack")
+AND
+ObjectGetFlag(_Item, "LLFULOOT_MovedItemToBackpack", 0)
+AND
+ItemIsStoryItem(_Item, 0)
+AND
+NOT DB_HasStoryEvent(_Item, _) // Don't move quest items
+AND
+ItemGetAmount(_Item, _Amount)
+AND
+GetInventoryOwner(_Item, _Owner)
+AND
+DB_LLFULOOT_Temp_TraderBackpack(_Character, _Backpack)
+THEN
+ObjectSetFlag(_Item, "LLFULOOT_MovedItemToBackpack", 0);
+ItemToInventory(_Item, _Backpack, _Amount, 0, 1);
 
 PROC
 LLFULOOT_MoveArmor((CHARACTERGUID)_Character, (ITEMGUID)_Backpack, 1)
@@ -267,8 +292,9 @@ CharacterIsDead(_Character, 0)
 AND
 DB_LLFULOOT_Temp_TraderBackpack(_Character, _Backpack)
 THEN
-DebugBreak("[LLFULOOT:CharacterStatusRemoved(DYING)] Character didn't die. Moving items back and removing backpack.");
 NOT DB_LLFULOOT_Temp_TraderBackpack(_Character, _Backpack);
+DebugBreak("[LLFULOOT:CharacterStatusRemoved(DYING)] Character didn't die. Moving items back and removing backpack.");
+ProcObjectTimerCancel(_Character, "Timers_LLFULOOT_MoveAllItems_Start");
 MoveAllItemsTo(_Backpack, _Character, 0, 0, 0);
 ProcObjectTimer(_Backpack, "LLFULOOT_Timers_RemoveItem", 250);
 SetStoryEvent(_Character, "LLFULOOT_FullLootCancelled");
