@@ -56,6 +56,7 @@ DB_Mods_Registered("FullLoot", "LaughingLeader", _Version);
 //END_REGION
 
 //REGION LeaderLib
+// [BEGIN_NO_OSITOOLS]
 IF
 StoryEvent(_, "LeaderLib_Initialized")
 AND
@@ -67,6 +68,14 @@ IF
 DB_LLFULOOT_RegisteredLeaderLibSettings(1)
 THEN
 DB_LeaderLib_ModApi_RegisterActiveGoal("FullLoot", "LaughingLeader", "LLFULOOT_99_Updater");
+DB_LeaderLib_ModApi_RegisterMenu("LaughingLeader.FullLoot", "[Full Loot] Settings", "LLFULOOT_SettingsMenu", "FullLoot", "LaughingLeader");
+DB_LeaderLib_Treasure_TreasureItemTemplates("LeaderLib.LeaderTrader.ModBooks", "BOOK_LLFULOOT_SettingsMenu_7056c5bd-5d3a-44c3-8511-df02f6464ccf", 1, "");
+DB_LeaderLib_Treasure_ItemMaxAmount("LeaderLib.LeaderTrader.ModBooks", "BOOK_LLFULOOT_SettingsMenu_7056c5bd-5d3a-44c3-8511-df02f6464ccf", 1);
+// [END_NO_OSITOOLS]
+
+PROC
+LeaderLib_Mods_OnModRegistered(d4ae0c69-d7c6-4068-af28-2613e50d7e5e, (INTEGER)_Version, (INTEGER)_Major, (INTEGER)_Minor, (INTEGER)_Revision, (INTEGER)_Build)
+THEN
 DB_LeaderLib_ModApi_RegisterMenu("LaughingLeader.FullLoot", "[Full Loot] Settings", "LLFULOOT_SettingsMenu", "FullLoot", "LaughingLeader");
 DB_LeaderLib_Treasure_TreasureItemTemplates("LeaderLib.LeaderTrader.ModBooks", "BOOK_LLFULOOT_SettingsMenu_7056c5bd-5d3a-44c3-8511-df02f6464ccf", 1, "");
 DB_LeaderLib_Treasure_ItemMaxAmount("LeaderLib.LeaderTrader.ModBooks", "BOOK_LLFULOOT_SettingsMenu_7056c5bd-5d3a-44c3-8511-df02f6464ccf", 1);
@@ -91,17 +100,17 @@ THEN
 SetStoryEvent(_Host, "LeaderLib_Commands_SaveGlobalSettings");
 
 PROC
-LeaderLib_GlobalSettings_InitModRegistration()
+LeaderLib_Mods_OnModRegistered(d4ae0c69-d7c6-4068-af28-2613e50d7e5e, (INTEGER)_Version, (INTEGER)_Major, (INTEGER)_Minor, (INTEGER)_Revision, (INTEGER)_Build)
 THEN
-DB_LeaderLib_ModApi_GlobalSettings_Register_Flag("FullLoot", "LaughingLeader", "LLFULOOT_InitialSetupComplete", 1);
-DB_LeaderLib_ModApi_GlobalSettings_Register_Flag("FullLoot", "LaughingLeader", "LLFULOOT_EquippedArmorLootable", 1);
-DB_LeaderLib_ModApi_GlobalSettings_Register_Flag("FullLoot", "LaughingLeader", "LLFULOOT_EquippedWeaponsLootable", 1);
-//DB_LeaderLib_ModApi_GlobalSettings_Register_Flag("FullLoot", "LaughingLeader", "LLFULOOT_PVPLootEnabled");
-DB_LeaderLib_ModApi_GlobalSettings_Register_Flag("FullLoot", "LaughingLeader", "LLFULOOT_AdjustGoldAmounts", 1);
-DB_LeaderLib_ModApi_GlobalSettings_Register_Flag("FullLoot", "LaughingLeader", "LLFULOOT_GoldReduction_Fourth");
-DB_LeaderLib_ModApi_GlobalSettings_Register_Flag("FullLoot", "LaughingLeader", "LLFULOOT_GoldReduction_Half");
-DB_LeaderLib_ModApi_GlobalSettings_Register_Flag("FullLoot", "LaughingLeader", "LLFULOOT_TraderDifficulty_StrongerTraders");
-DB_LeaderLib_ModApi_GlobalSettings_Register_Flag("FullLoot", "LaughingLeader", "LLFULOOT_TraderDifficulty_SpawnGuards");
+DB_LeaderLib_ModApi_GlobalSettings_Register_GlobalFlag(d4ae0c69-d7c6-4068-af28-2613e50d7e5e, "LLFULOOT_InitialSetupComplete", 1);
+DB_LeaderLib_ModApi_GlobalSettings_Register_GlobalFlag(d4ae0c69-d7c6-4068-af28-2613e50d7e5e, "LLFULOOT_EquippedArmorLootable", 1);
+DB_LeaderLib_ModApi_GlobalSettings_Register_GlobalFlag(d4ae0c69-d7c6-4068-af28-2613e50d7e5e, "LLFULOOT_EquippedWeaponsLootable", 1);
+DB_LeaderLib_ModApi_GlobalSettings_Register_GlobalFlag(d4ae0c69-d7c6-4068-af28-2613e50d7e5e, "LLFULOOT_AdjustGoldAmounts", 1);
+DB_LeaderLib_ModApi_GlobalSettings_Register_GlobalFlag(d4ae0c69-d7c6-4068-af28-2613e50d7e5e, "LLFULOOT_GoldReduction_Fourth");
+DB_LeaderLib_ModApi_GlobalSettings_Register_GlobalFlag(d4ae0c69-d7c6-4068-af28-2613e50d7e5e, "LLFULOOT_GoldReduction_Half");
+DB_LeaderLib_ModApi_GlobalSettings_Register_GlobalFlag(d4ae0c69-d7c6-4068-af28-2613e50d7e5e, "LLFULOOT_TraderDifficulty_StrongerTraders");
+DB_LeaderLib_ModApi_GlobalSettings_Register_GlobalFlag(d4ae0c69-d7c6-4068-af28-2613e50d7e5e, "LLFULOOT_TraderDifficulty_SpawnGuards");
+//DB_LeaderLib_ModApi_GlobalSettings_Register_GlobalFlag(d4ae0c69-d7c6-4068-af28-2613e50d7e5e, "LLFULOOT_PVPLootEnabled");
 //END_REGION
 
 EXITSECTION
