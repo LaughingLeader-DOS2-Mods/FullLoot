@@ -531,14 +531,12 @@ NOT DB_LLFULOOT_Trader_Temp_SpawnGuards(_Trader, _Player, _CombatID, _GuardAmoun
 DB_LLFULOOT_Trader_Temp_SpawnGuards(_Trader, _Player, _CombatID, _NextAmount);
 DB_LLFULOOT_Trader_Temp_GuardCombat(_Trader, _Guard, _Player, _CombatID);
 //CharacterApplyRacePreset(_Guard, _Race);
-CharacterTransform(_Guard, _RaceTemplate, 0, 1, 0, 0, 0, 0, 1); // Appearance only
+CharacterTransform(_Guard, _RaceTemplate, 0, 1, 0, 0, 0, 0, 0); // Appearance only
+//CharacterTransformAppearanceTo(_Guard, _Trader, 0, 0);
 CharacterSetCustomName(_Guard, _Name);
 
 SetOnStage(_Guard, 0);
-CharacterMakePlayer(_Guard);
-CharacterApplyPreset(_Guard, _Preset);
-//PROC_GLO_PartyMembers_Kick(_Guard, _Faction);
-CharacterMakeNPC(_Guard);
+LLFULOOT_Trader_Internal_SetupGuard(_Guard, _Preset);
 
 SetFaction(_Guard, _Faction);
 CharacterAddAttitudeTowardsPlayer(_Guard, _Trader, 100);
@@ -551,7 +549,32 @@ SetTag(_Guard, "LLFULOOT_TraderGuard");
 SetTag(_Guard, "GUARD");
 DB_LLFULOOT_Trader_Bodyguards(_Trader, _Guard);
 TeleportTo(_Guard, _Trader, "LLFULOOT_GuardAppeared", 0, 0);
+ProcObjectTimerCancel(_Trader, "Timers_LLFULOOT_Trader_SpawnNextGuard");
+ProcObjectTimer(_Trader, "Timers_LLFULOOT_Trader_SpawnNextGuard", 250);
+
+PROC
+ProcObjectTimerFinished((CHARACTERGUID)_Trader, "Timers_LLFULOOT_Trader_SpawnNextGuard")
+THEN
 LLFULOOT_Trader_Internal_SpawnNextGuard(_Trader);
+
+// [BEGIN_NO_OSITOOLS]
+PROC
+LLFULOOT_Trader_Internal_SetupGuard((CHARACTERGUID)_Guard, (STRING)_Preset)
+THEN
+CharacterMakePlayer(_Guard);
+CharacterApplyPreset(_Guard, _Preset);
+//PROC_GLO_PartyMembers_Kick(_Guard, _Faction);
+CharacterMakeNPC(_Guard);
+// [END_NO_OSITOOLS]
+
+/* [OSITOOLS_ONLY]
+PROC
+LLFULOOT_Trader_Internal_SetupGuard((CHARACTERGUID)_Guard, (STRING)_Preset)
+AND
+GetUUID(_Guard, _GuardStr)
+THEN
+NRD_LuaCall("LLFULOOT_Ext_SetupGuard", _GuardStr, _Preset);
+*/
 
 PROC
 LLFULOOT_Trader_Internal_SpawnNextGuard((CHARACTERGUID)_Trader)
