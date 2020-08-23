@@ -45,6 +45,14 @@ THEN
 ObjectSetFlag(_Trader, "LLFULOOT_GeneratedTradeTreasure");
 //END_REGION
 
+// For other mods to use
+QRY
+LLFULOOT_QRY_SkipLootSetup((CHARACTERGUID)_Char)
+AND
+0 == 1
+THEN
+DB_NOOP(1);
+
 QRY
 LLFULOOT_QRY_CanFullyLoot((CHARACTERGUID)_Character)
 AND
@@ -68,6 +76,8 @@ IF
 CharacterPrecogDying(_Character)
 AND
 NOT DB_GlobalFlag("LLFULOOT_LootDisabled")
+AND
+NOT LLFULOOT_QRY_SkipLootSetup(_Character)
 AND
 LLFULOOT_QRY_CanFullyLoot(_Character)
 AND
@@ -116,6 +126,29 @@ DB_GlobalFlag("LLFULOOT_AdjustGoldAmounts")
 THEN
 LLFULOOT_StoreGoldAmount(_Character);
 
+QRY
+LLFULOOT_ItemIsEquipped((CHARACTERGUID)_Char, (ITEMGUID)_Item)
+AND
+DB_LLFULOOT_ArmorSlots(_Slot)
+AND
+CharacterGetEquippedItem(_Char, _Slot, _Item)
+THEN
+DB_NOOP(1);
+
+QRY
+LLFULOOT_ItemIsEquipped((CHARACTERGUID)_Char, (ITEMGUID)_Item)
+AND
+CharacterGetEquippedItem(_Char, "Weapon", _Item)
+THEN
+DB_NOOP(1);
+
+QRY
+LLFULOOT_ItemIsEquipped((CHARACTERGUID)_Char, (ITEMGUID)_Item)
+AND
+CharacterGetEquippedItem(_Char, "Shield", _Item)
+THEN
+DB_NOOP(1);
+
 PROC
 LLFULOOT_OnCharacterDying((CHARACTERGUID)_Character, (INTEGER)_IsTrader)
 AND
@@ -145,9 +178,11 @@ NOT DB_HasStoryEvent(_Item, _) // Don't move quest items
 AND
 ItemGetAmount(_Item, _Amount)
 AND
-GetInventoryOwner(_Item, _Owner)
+GetInventoryOwner(_Item, (CHARACTERGUID)_Owner)
 AND
-DB_LLFULOOT_Temp_TraderBackpack(_Character, _Backpack)
+NOT LLFULOOT_ItemIsEquipped(_Owner, _Item)
+AND
+DB_LLFULOOT_Temp_TraderBackpack(_Owner, _Backpack)
 THEN
 ObjectSetFlag(_Item, "LLFULOOT_MovedItemToBackpack", 0);
 ItemToInventory(_Item, _Backpack, _Amount, 0, 1);
