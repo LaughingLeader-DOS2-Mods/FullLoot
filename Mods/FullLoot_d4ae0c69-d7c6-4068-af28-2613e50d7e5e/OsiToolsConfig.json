@@ -1,5 +1,6 @@
 {
-    "RequiredExtensionVersion": 42,
+    "RequiredExtensionVersion": 50,
+	"ModTable": "FullLoot",
     "FeatureFlags": [
         "OsirisExtensions",
         "Lua",
