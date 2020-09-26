@@ -1,0 +1,17 @@
+Key	Content	Handle
+LLFULOOT_InitialSetupComplete	Setup Complete	h099fd6feg2526g45fbgbeb7g56bbdbe339e2
+LLFULOOT_InitialSetupComplete_Description	[Debug] Uncheck to trigger setup again when the scripts check for this flag.	h2b2fc3f1gfa62g45c7ga94agc0caeb239d50
+LLFULOOT_EquippedArmorLootable	Make Equipped Armor Lootable	hccb35329g0244g4723g9086g1def4d3cd626
+LLFULOOT_EquippedArmorLootable_Description	[Debug] Most NPCs don't actually have any equippable armor, so this won't do much.	h1f6556fbg578bg40e8g83d5g7b720c38e5db
+LLFULOOT_EquippedWeaponsLootable	Make Equipped Weapons Lootable	he9533755ga15ag4535gb1cag9b2a93e8a370
+LLFULOOT_EquippedWeaponsLootable_Description	[Debug] Most NPCs don't actually have any equippable weapons, so this won't do much.	h615a03e1g678ag4801g91c8g30428c62773d
+LLFULOOT_AdjustGoldAmounts	Enable Adjusting Trader Gold	h4957ea72g3f42g4193ga943g3104fdd60530
+LLFULOOT_AdjustGoldAmounts_Description	Looted trader gold will be modified to be less than the original amount, for balance.	h5d8ec186g6819g4b0egae11g96befe01ddfe
+LLFULOOT_GoldReduction_Fourth	Reduce Trader Gold to 1/4	hc82591e4g65c7g4a11g9b6eg5b49511cd276
+LLFULOOT_GoldReduction_Fourth_Description	Trader gold will be reduced to a fourth of the original value.	h012cd1f3g607dg4819gaaccgcef114dcf02e
+LLFULOOT_GoldReduction_Half	Reduce Trader Gold to 1/2	hcf69efe3gdd23g46e0ga693g8bb9084dd235
+LLFULOOT_GoldReduction_Half_Description	Trader gold will be reduced to half of the original value.	h70eaa15egf34eg485eg800bg52c6c80aaa7b
+LLFULOOT_TraderDifficulty_StrongerTraders	Enable Stronger Traders	h1c83bea4g2517g4b2cg88ebg1fe9f83ef041
+LLFULOOT_TraderDifficulty_StrongerTraders_Description	Traders will be a bit tougher to protect their precious loot!	haa850ac1gc761g49edg8f01g940d0c89bc91
+LLFULOOT_TraderDifficulty_SpawnGuards	Enable Trader Guards	h7ffda805g2711g4d15gb6a1g25a828759ed1
+LLFULOOT_TraderDifficulty_SpawnGuards_Description	Traders will have bodyguards spawn to protect them.	h0eda5864g82c4g4b0fg861cg4556fc1c94a6
