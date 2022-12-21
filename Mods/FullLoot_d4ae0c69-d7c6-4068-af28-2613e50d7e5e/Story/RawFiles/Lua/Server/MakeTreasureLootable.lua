@@ -178,6 +178,91 @@ Ext.Osiris.RegisterListener("TradeGenerationEnded", 1, "after", function (guid)
 	end
 end)
 
+---@param stat StatEntryWeapon
+---@return StatEntryWeapon|nil
+local function FindRootParent(stat)
+	if not stat then
+		return nil
+	end
+	if stat.Using and stat.Using ~= "" then
+		return FindRootParent(Ext.Stats.Get(stat.Using, nil, false))
+	else
+		return stat
+	end
+end
+
+---@param item EsvItem
+---@return string
+local function GetTemplatGUID(item)
+	if item.RootTemplate.RootTemplate ~= "" then
+		return item.RootTemplate.RootTemplate
+	else
+		return item.RootTemplate.Id
+	end
+end
+
+---@param stat StatEntryWeapon
+---@return string|nil
+local function GetItemRootTemplate(stat)
+	if stat.ItemGroup ~= "" then
+		local itemGroup = Ext.Stats.ItemGroup.GetLegacy(stat.ItemGroup)
+		if itemGroup then
+			for _,lg in pairs(itemGroup.LevelGroups) do
+				for _,rg in pairs(lg.RootGroups) do
+					if rg.RootGroup ~= "" then
+						return rg.RootGroup
+					end
+				end
+			end
+		end
+	end
+	return nil
+end
+
+---@param item EsvItem
+---@param character EsvCharacter
+---@return EsvItem|nil
+local function MakeUsableWeapon(item, character)
+	if string.sub(item.StatsId, 1, 1) == "_" then -- NPC item
+		local stat = FindRootParent(item.Stats.StatsEntry)
+		if stat then
+			if string.sub(stat.Name, 1, 1) == "_" then
+				local baseDerived = Ext.Stats.Get("WPN_" .. stat.Name, nil, false)
+				if baseDerived then
+					stat = baseDerived
+				else
+					stat = nil
+				end
+			end
+			if stat then
+				local template = nil
+				if item.Stats.StatsEntry.ItemGroup ~= "EMPTY" then
+					template = GetTemplatGUID(item)
+				else
+					template = GetItemRootTemplate(stat)
+				end
+				if template then
+					local constructor = Ext.CreateItemConstructor(template)
+					---@type EocItemDefinition
+					local props = constructor[1]
+					props:ResetProgression()
+					props.IsIdentified = true
+					props.StatsLevel = character.Stats.Level
+					props.GenerationLevel = character.Stats.Level
+
+					local newItem = constructor:Construct()
+					if newItem then
+						NRD_ItemSetIdentified(newItem.MyGuid, 1)
+						return newItem
+					end
+				end
+			end
+		end
+	else
+		return item
+	end
+end
+
 ---@param guid GUID
 Ext.Osiris.RegisterListener("CharacterPrecogDying", 1, "before", function (guid)
 	if GlobalGetFlag("LLFULOOT_LootDisabled") == 0 and ObjectExists(guid) == 1 then
@@ -225,16 +310,22 @@ Ext.Osiris.RegisterListener("CharacterPrecogDying", 1, "before", function (guid)
 					local offhand = CharacterGetEquippedItem(guid, "Shield")
 					if not NULL_UUID[mainhand] then
 						local item = Ext.Entity.GetItem(mainhand) --[[@as EsvItem]]
-						if item and string.sub(item.StatsId, 1, 1) ~= "_" then
-							ObjectSetFlag(guid, "LLFULOOT_EquipmentItemMadeLootable", 0)
-							ItemToInventory(mainhand, guid, 1, 0, 1)
+						if item then
+							local lootableItem = MakeUsableWeapon(item, character)
+							if lootableItem then
+								ObjectSetFlag(lootableItem.MyGuid, "LLFULOOT_EquipmentItemMadeLootable", 0)
+								ItemToInventory(lootableItem.MyGuid, guid, 1, 0, 1)
+							end
 						end
 					end
 					if not NULL_UUID[offhand] then
 						local item = Ext.Entity.GetItem(offhand) --[[@as EsvItem]]
-						if item and string.sub(item.StatsId, 1, 1) ~= "_" then
-							ObjectSetFlag(guid, "LLFULOOT_EquipmentItemMadeLootable", 0)
-							ItemToInventory(offhand, guid, 1, 0, 1)
+						if item then
+							local lootableItem = MakeUsableWeapon(item, character)
+							if lootableItem then
+								ObjectSetFlag(lootableItem.MyGuid, "LLFULOOT_EquipmentItemMadeLootable", 0)
+								ItemToInventory(lootableItem.MyGuid, guid, 1, 0, 1)
+							end
 						end
 					end
 				end
