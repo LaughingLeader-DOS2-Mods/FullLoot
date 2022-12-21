@@ -1,0 +1,44 @@
+{
+	"TitleColor": "#D60000",
+	"Data": {
+		"Flags": [
+			{
+				"Type": "Global",
+				"Entries": [
+					"LLFULOOT_InitialSetupComplete",
+					"LLFULOOT_EquippedArmorLootable",
+					"LLFULOOT_EquippedWeaponsLootable",
+					"LLFULOOT_AdjustGoldAmounts",
+					"LLFULOOT_GoldReduction_Fourth",
+					"LLFULOOT_GoldReduction_Half",
+					"LLFULOOT_TraderDifficulty_StrongerTraders",
+					"LLFULOOT_TraderDifficulty_SpawnGuards"
+				],
+				"Settings": {
+					"LLFULOOT_InitialSetupComplete": {
+						"DebugOnly": true
+					},
+					"LLFULOOT_EquippedArmorLootable": {
+						"DebugOnly": true
+					},
+					"LLFULOOT_EquippedWeaponsLootable": {
+						"DebugOnly": true
+					}
+				}
+			}
+		]
+	},
+	"MenuOrder": [{
+			"Entries": [
+				"LLFULOOT_AdjustGoldAmounts",
+				"LLFULOOT_GoldReduction_Fourth",
+				"LLFULOOT_GoldReduction_Half",
+				"LLFULOOT_TraderDifficulty_StrongerTraders",
+				"LLFULOOT_TraderDifficulty_SpawnGuards",
+				"LLFULOOT_EquippedArmorLootable",
+				"LLFULOOT_EquippedWeaponsLootable",
+				"LLFULOOT_InitialSetupComplete"
+			]
+		}
+	]
+}
