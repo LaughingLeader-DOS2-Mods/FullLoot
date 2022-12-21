@@ -9,15 +9,15 @@ GameStarted(_Level, _)
 AND
 IsGameLevel(_Level, 1)
 AND
-LLFULOOT_Updater_QRY_UpdateNeeded("1.1.2.0")
+LLFULOOT_Updater_QRY_UpdateNeeded("1.2.0.0")
 THEN
 LLFULOOT_Internal_RegisterMod();
 
 PROC
 LLFULOOT_Internal_RegisterMod()
 THEN
-LLFULOOT_Updater_RemoveOldVersions("1.1.2.0");
-LLFULOOT_Updater_SetVersion("1.1.2.0");
+LLFULOOT_Updater_RemoveOldVersions("1.2.0.0");
+LLFULOOT_Updater_SetVersion("1.2.0.0");
 
 QRY
 LLFULOOT_Updater_QRY_UpdateNeeded((STRING)_Version)
@@ -100,6 +100,52 @@ THEN
 SetStoryEvent(_Host, "LeaderLib_Commands_SaveGlobalSettings");
 //END_REGION
 
+//REGION TOGGLING_SCRIPT
+
+//If the extender is active, all of these old osiris rules are instead handled in lua
+
+/* [OSITOOLS_ONLY]
+IF
+GameStarted(_,_)
+AND
+SysIsActive("LLFULOOT_01_FullLoot")
+THEN
+SysCompleteGoal("LLFULOOT_01_FullLoot");
+
+IF
+GameStarted(_,_)
+AND
+SysIsActive("LLFULOOT_02_TraderDifficulty")
+THEN
+SysCompleteGoal("LLFULOOT_02_TraderDifficulty");
+*/
+
+// [BEGIN_NO_OSITOOLS]
+IF
+GameStarted(_,_)
+AND
+NOT SysIsActive("LLFULOOT_01_FullLoot")
+THEN
+SysActivateGoal("LLFULOOT_01_FullLoot");
+
+IF
+GameStarted(_,_)
+AND
+NOT SysIsActive("LLFULOOT_02_TraderDifficulty")
+THEN
+SysActivateGoal("LLFULOOT_02_TraderDifficulty");
+// [END_NO_OSITOOLS]
+
+PROC
+LLFULLOOT_ToggleScript((STRING)_Name, 0)
+THEN
+SysCompleteGoal(_Name);
+
+PROC
+LLFULLOOT_ToggleScript((STRING)_Name, 1)
+THEN
+SysActivateGoal(_Name);
+//END_REGION
 EXITSECTION
 
 ENDEXITSECTION

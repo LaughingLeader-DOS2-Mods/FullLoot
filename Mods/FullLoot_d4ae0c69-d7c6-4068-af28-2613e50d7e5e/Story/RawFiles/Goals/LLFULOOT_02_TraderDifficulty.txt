@@ -548,7 +548,7 @@ CharacterLevelUpTo(_Guard, _Level);
 SetTag(_Guard, "LLFULOOT_TraderGuard");
 SetTag(_Guard, "GUARD");
 DB_LLFULOOT_Trader_Bodyguards(_Trader, _Guard);
-TeleportTo(_Guard, _Trader, "LLFULOOT_GuardAppeared", 0, 0);
+TeleportTo(_Guard, _Trader, "LLFULOOT_GuardAppeared", 0, 0, 0);
 ProcObjectTimerCancel(_Trader, "Timers_LLFULOOT_Trader_SpawnNextGuard");
 ProcObjectTimer(_Trader, "Timers_LLFULOOT_Trader_SpawnNextGuard", 250);
 
@@ -573,7 +573,7 @@ LLFULOOT_Trader_Internal_SetupGuard((CHARACTERGUID)_Guard, (STRING)_Preset)
 AND
 GetUUID(_Guard, _GuardStr)
 THEN
-NRD_LuaCall("LLFULOOT_Ext_SetupGuard", _GuardStr, _Preset);
+NRD_ModCall("FullLoot", "SetupGuard", _GuardStr, _Preset);
 */
 
 PROC
