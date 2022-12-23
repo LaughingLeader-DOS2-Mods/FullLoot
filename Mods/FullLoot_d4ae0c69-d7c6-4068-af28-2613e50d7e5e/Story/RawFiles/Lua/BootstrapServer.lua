@@ -6,7 +6,9 @@ local Tests = Ext.Require("Server/Tests.lua")
 ---@class FullLootPersistentVars
 local _defaultPersistentVars = {
 	---@type table<GUID, integer>
-	GoldAmount = {}
+	GoldAmount = {},
+	---@type table<GUID, GUID>
+	TempBackpack = {}
 }
 
 local function CopyTable(source)

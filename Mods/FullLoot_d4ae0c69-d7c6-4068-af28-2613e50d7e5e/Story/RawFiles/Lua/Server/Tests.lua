@@ -1,11 +1,14 @@
 local Tests = {}
 
+local _testing = false
 local _cleanupFunctions = {}
+
 local function CleanupTests()
 	for i=1,#_cleanupFunctions do
 		pcall(_cleanupFunctions[i])
 	end
 	_cleanupFunctions = {}
+	_testing = false
 end
 
 local function SetupTrader(test, GameHelpers)
@@ -19,7 +22,7 @@ local function SetupTrader(test, GameHelpers)
 		end
 	end
 	_cleanupFunctions[#_cleanupFunctions+1] = cleanup
-	Mods.LeaderLib.Timer.StartOneshot("", 30000, cleanup)
+	Mods.LeaderLib.Timer.StartOneshot("", 60000, cleanup)
 	SetStoryEvent(character, "ClearPeaceReturn")
 	CharacterSetReactionPriority(character, "StateManager", 0)
 	CharacterSetReactionPriority(character, "ResetInternalState", 0)
@@ -32,74 +35,86 @@ local function SetupTrader(test, GameHelpers)
 	SetCanFight(character, 0)
 	CharacterDisableAllCrimes(character)
 	CharacterEnableCrimeWarnings(character, 0)
+	CharacterSetCustomName(character, "Test Trader")
 	return host,character
 end
 
 ---@param self LuaTest
-local function TestDeathGeneration(self)
+local function TestTradeDeath(self, doGenerateTreasure)
 	local GameHelpers = Mods.LeaderLib.GameHelpers
 	local host,character = SetupTrader(self, GameHelpers)
 	self:Wait(250)
-	local trader = Ext.Entity.GetCharacter(character)
-	trader.RootTemplate.TradeTreasures[#trader.RootTemplate.TradeTreasures+1] = "ST_ArmorGenMagicTrader"
-	trader.RootTemplate.TradeTreasures[#trader.RootTemplate.TradeTreasures+1] = "ST_WeaponGenMagicTrader"
-	trader.TreasureGeneratedForTrader = false
+	local trader = Ext.Entity.GetCharacter(character) --[[@as EsvCharacter]]
+	trader.CurrentTemplate.TradeTreasures[#trader.CurrentTemplate.TradeTreasures+1] = "ST_ArmorGenMagicTrader"
+	trader.CurrentTemplate.TradeTreasures[#trader.CurrentTemplate.TradeTreasures+1] = "ST_WeaponGenMagicTrader"
+	if doGenerateTreasure then
+		GenerateItems(host, character)
+		trader.TreasureGeneratedForTrader = true
+	else
+		trader.TreasureGeneratedForTrader = false
+	end
 	self:Wait(250)
-	ApplyDamage(character, 9999, "Physical", host)
-	self:Wait(3000)
-	trader = Ext.Entity.GetCharacter(character)
-	local items = {}
+	local totalItems = 0
+	trader = Ext.Entity.GetCharacter(character) --[[@as EsvCharacter]]
 	for _,v in pairs(trader:GetInventoryItems()) do
-		local item = Ext.Entity.GetItem(v)
+		local item = Ext.Entity.GetItem(v) --[[@as EsvItem]]
 		if item and item.Slot > 14 and not LootHelpers.ItemIsNPCItem(item) then
-			self:AssertEquals(item.UnsoldGenerated, false, "Item is still trade treasure")
-			items[#items+1] = item.StatsId
+			totalItems = totalItems + 1
 		end
 	end
-	self:AssertEquals(#items > 0, true, "Failed to generate any trade treasure")
-	Ext.Utils.Print("[TestDeathGeneration] Generated treasure:")
+	ApplyDamage(character, 9999, "Physical", host)
+	self:Wait(3000)
+	trader = Ext.Entity.GetCharacter(character) --[[@as EsvCharacter]]
+	local items = {}
+	local nextTotal = 0
+	for _,v in pairs(trader:GetInventoryItems()) do
+		local item = Ext.Entity.GetItem(v) --[[@as EsvItem]]
+		if item and item.Slot > 14 and not LootHelpers.ItemIsNPCItem(item) then
+			self:AssertNotEquals(item.UnsoldGenerated, true, string.format("Item %s is still trade treasure UnsoldGenerated(%s)", item.StatsId, item.UnsoldGenerated))
+			nextTotal = nextTotal + 1
+			items[nextTotal] = item.StatsId
+		end
+	end
+	self:AssertEquals(nextTotal > 0, true, "Failed to generate any trade treasure")
+	self:AssertEquals(nextTotal >= totalItems, true, string.format("Lost items from death before(%s) => after(%s)", totalItems, nextTotal))
+	--table.sort(items)
+	local calculatedItems = {}
+	for i=1,nextTotal do
+		local id = items[i]
+		if calculatedItems[id] then
+			calculatedItems[id] = calculatedItems[id] + 1
+		else
+			calculatedItems[id] = 1
+		end
+	end
+	Ext.Utils.Print("Generated treasure:")
 	Ext.Utils.Print("==========")
-	Ext.Dump(items)
+	Ext.Dump(calculatedItems)
 	Ext.Utils.Print("==========")
 	self:Wait(1000)
+	return true
+end
+
+---@param self LuaTest
+local function TestDeathGeneration(self)
+	_testing = true
+	Ext.Utils.Print("[TestDeathGeneration] Testing generating trade treasure on death.")
+	TestTradeDeath(self, false)
 	return true
 end
 
 ---@param self LuaTest
 local function TestPreDeathGeneration(self)
-	local GameHelpers = Mods.LeaderLib.GameHelpers
-	local host,character = SetupTrader(self, GameHelpers)
-	self:Wait(250)
-	local trader = Ext.Entity.GetCharacter(character)
-	trader.RootTemplate.TradeTreasures[#trader.RootTemplate.TradeTreasures+1] = "ST_ArmorGenMagicTrader"
-	trader.RootTemplate.TradeTreasures[#trader.RootTemplate.TradeTreasures+1] = "ST_WeaponGenMagicTrader"
-	self:Wait(500)
-	GenerateItems(host, character)
-	self:Wait(1500)
-	ApplyDamage(character, 9999, "Physical", host)
-	self:Wait(3000)
-	trader = Ext.Entity.GetCharacter(character)
-	local items = {}
-	for _,v in pairs(trader:GetInventoryItems()) do
-		local item = Ext.Entity.GetItem(v)
-		if item and item.Slot > 14 and not LootHelpers.ItemIsNPCItem(item) then
-			self:AssertEquals(item.UnsoldGenerated, false, string.format("Item (%s) is still UnsoldGenerated", item.StatsId))
-			items[#items+1] = item.StatsId
-		end
-	end
-	self:AssertEquals(#items > 0, true, "Failed to generate any trade treasure")
-	Ext.Utils.Print("[TestPreDeathGeneration] Generated treasure:")
-	Ext.Utils.Print("==========")
-	Ext.Dump(items)
-	Ext.Utils.Print("==========")
-	self:Wait(1000)
+	_testing = true
+	Ext.Utils.Print("[TestDeathGeneration] Testing making pre-generated trade treasure lootable.")
+	TestTradeDeath(self, true)
 	return true
 end
 
 function Tests.Init()
-	local test = Mods.LeaderLib.Classes.LuaTest.Create("FullLoot.TraderTest", {TestDeathGeneration, TestPreDeathGeneration})
+	local test = Mods.LeaderLib.Classes.LuaTest:Create("FullLoot.TraderTest", {TestDeathGeneration, TestPreDeathGeneration})
 	test.Cleanup = CleanupTests
-	Mods.LeaderLib.Testing.RegisterConsoleCommandTest("FullLoot", test, "Tests generating trader treasure / making it fully lootable when a trader dies.")
+	Mods.LeaderLib.Testing.RegisterConsoleCommandTest("fullloot", test, "Tests generating trader treasure / making it fully lootable when a trader dies.")
 end
 
 return Tests

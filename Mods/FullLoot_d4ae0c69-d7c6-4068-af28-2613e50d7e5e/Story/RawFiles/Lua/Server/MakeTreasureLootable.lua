@@ -1,4 +1,12 @@
 
+local function _PrintDebug(msg, ...)
+	Ext.Utils.Print(string.format(msg, ...))
+end
+
+if not Ext.Debug.IsDeveloperMode() then
+	_PrintDebug = function () end
+end
+
 ---@param item EsvItem
 local function GetItemOwner(item)
 	if Ext.Utils.IsValidHandle(item.OwnerHandle) then
@@ -21,22 +29,45 @@ local function GetGUID(str)
 	return result
 end
 
+---@param character EsvCharacter
+local function MoveItemsToTempBackpack(character)
+	local backpack = CreateItemTemplateAtPosition("394d4e05-b258-4b3f-a78b-eff97a25b231", 0, 0, 0)
+	MoveAllItemsTo(character.MyGuid, backpack, 0, 0, 1)
+	PersistentVars.TempBackpack[GetGUID(backpack)] = character.MyGuid
+	SetVarObject(backpack, "LLFULLOOT_Target", character.MyGuid)
+end
+
+---@param character EsvCharacter
+local function MakeItemsLootable(character)
+	if not character.CorpseLootable then
+		_PrintDebug("[FullLoot:LLFULOOT_AdjustGold] Trader (%s) - Making items lootable.", character.DisplayName)
+		CharacterSetCorpseLootable(character.MyGuid, 1)
+	end
+	for _,v in pairs(character:GetInventoryItems()) do
+		local item = Ext.Entity.GetItem(v)
+		if item and item.UnsoldGenerated then
+			item.UnsoldGenerated = false
+			ObjectSetFlag(item.MyGuid, "LLFULOOT_TradeItemMadeLootable", 0)
+		end
+	end
+end
+
 ---@param guid string
 ---@param timerName string
 Ext.Osiris.RegisterListener("ProcObjectTimerFinished", 2, "before", function (guid, timerName)
 	if timerName == "LLFULOOT_MakeItemsLootable" then
-		guid = GetGUID(guid)
 		local character = Ext.Entity.GetCharacter(guid) --[[@as EsvCharacter]]
 		if character then
-			for _,v in pairs(character:GetInventoryItems()) do
-				local item = Ext.Entity.GetItem(v)
-				if item and item.UnsoldGenerated then
-					item.UnsoldGenerated = false
-					ObjectSetFlag(item.MyGuid, "LLFULOOT_TradeItemMadeLootable", 0)
-				end
-			end
-			CharacterSetCorpseLootable(character.MyGuid, 1)
+			MakeItemsLootable(character)
 		end
+	elseif timerName == "LLFULOOT_MoveItemsToCorpse" then
+		local owner = GetVarObject(guid, "LLFULLOOT_Target")
+		MoveAllItemsTo(guid, owner, 0, 0, 1)
+		Osi.ProcObjectTimerCancel(guid, "LLFULOOT_DeleteBackpack")
+		Osi.ProcObjectTimer(guid, "LLFULOOT_DeleteBackpack", 250)
+	elseif timerName == "LLFULOOT_DeleteBackpack" then
+		ItemRemove(guid)
+		PersistentVars.TempBackpack[guid] = nil
 	elseif timerName == "LLFULOOT_AdjustGold" then
 		guid = GetGUID(guid)
 		local character = Ext.Entity.GetCharacter(guid)
@@ -59,9 +90,7 @@ Ext.Osiris.RegisterListener("ProcObjectTimerFinished", 2, "before", function (gu
 					end
 				end
 				if goldReduced > 0 then
-					if Ext.Debug.IsDeveloperMode() then
-						Ext.Utils.Print(string.format("[FullLoot] Reducing trader's (%s) lootable gold from (%s) to (%s)", character.DisplayName, gold, goldReduced))
-					end
+					_PrintDebug("[FullLoot:LLFULOOT_AdjustGold] Trader (%s) - Reducing lootable gold from (%s) to (%s)", character.DisplayName, gold, goldReduced)
 					CharacterAddGold(guid, goldReduced)
 				end
 			end
@@ -127,7 +156,7 @@ local function _IsTrader(character)
 	and not character.Summon
 	and not character.PartyFollower
 	then
-		local tradeTreasures = character.RootTemplate.TradeTreasures or {}
+		local tradeTreasures = character.CurrentTemplate.TradeTreasures or {}
 		local totalTradeTreasures = #tradeTreasures
 		return (character:HasTag("TRADER") or character.Trader) and totalTradeTreasures > 0
 	end
@@ -146,6 +175,7 @@ Ext.Osiris.RegisterListener("CharacterKilledBy", 1, "before", function (guid, ow
 		and CharacterIsInPartyWith(character.MyGuid, owner) == 0
 		then
 			CharacterSetCorpseLootable(guid, 1)
+			_PrintDebug("[FullLoot:LLFULOOT_AdjustGold] (%s) - Making corpse lootable.", character.DisplayName)
 		end
 	end
 end)
@@ -155,6 +185,7 @@ Ext.Osiris.RegisterListener("CharacterResurrected", 1, "after", function (guid)
 	--If a trader gets resurrected somehow, reset treasure
 	local character = Ext.Entity.GetCharacter(guid) --[[@as EsvCharacter]]
 	if character and _IsTrader(character) then
+		_PrintDebug("[FullLoot:CharacterResurrected] Trader (%s) - Reverting lootable items.", character.DisplayName)
 		for _,v in pairs(character:GetInventoryItems()) do
 			local item = Ext.Entity.GetItem(v)
 			if item and item.Slot > 14 and not _ItemIsNPCItem(item) then
@@ -167,14 +198,6 @@ Ext.Osiris.RegisterListener("CharacterResurrected", 1, "after", function (guid)
 				end
 			end
 		end
-	end
-end)
-
----@param guid string
-Ext.Osiris.RegisterListener("TradeGenerationEnded", 1, "after", function (guid)
-	if CharacterIsDead(guid) == 1 or HasActiveStatus(guid, "DYING") == 1 then
-		Osi.ProcObjectTimerCancel(guid, "LLFULOOT_MakeItemsLootable")
-		Osi.ProcObjectTimer(guid, "LLFULOOT_MakeItemsLootable", 500)
 	end
 end)
 
@@ -268,21 +291,14 @@ Ext.Osiris.RegisterListener("CharacterPrecogDying", 1, "before", function (guid)
 	if GlobalGetFlag("LLFULOOT_LootDisabled") == 0 and ObjectExists(guid) == 1 then
 		local character = Ext.Entity.GetCharacter(guid) --[[@as EsvCharacter]]
 		if character then
+			guid = GetGUID(guid)
 			if not _CannotDie(character) and _IsTrader(character) then
 				local host = CharacterGetHostCharacter()
 				if not character.TreasureGeneratedForTrader then
+					_PrintDebug("[FullLoot:CharacterPrecogDying] Trader (%s) - Generating treasure.", character.DisplayName)
 					GenerateItems(host, guid)
-					Osi.ProcObjectTimerCancel(guid, "LLFULOOT_MakeItemsLootable")
-					Osi.ProcObjectTimer(guid, "LLFULOOT_MakeItemsLootable", 500)
-				else
-					for _,v in pairs(character:GetInventoryItems()) do
-						local item = Ext.Entity.GetItem(v) --[[@as EsvItem]]
-						if item and item.UnsoldGenerated and not _ItemIsNPCItem(item) then
-							item.UnsoldGenerated = false
-							ObjectSetFlag(item.MyGuid, "LLFULOOT_TradeItemMadeLootable", 0)
-						end
-					end
 				end
+
 				if GlobalGetFlag("LLFULOOT_AdjustGoldAmounts") == 1 then
 					local gold = CharacterGetGold(guid)
 					if gold and gold > 0 then
@@ -329,9 +345,38 @@ Ext.Osiris.RegisterListener("CharacterPrecogDying", 1, "before", function (guid)
 						end
 					end
 				end
+
+				MakeItemsLootable(character)
+				MoveItemsToTempBackpack(character)
 			end
 		end
 	end
+end)
+
+---@param guid string
+Ext.Osiris.RegisterListener("CharacterDied", 1, "before", function (guid)
+	guid = GetGUID(guid)
+	for backpack,charGUID in pairs(PersistentVars.TempBackpack) do
+		if charGUID == guid then
+			Osi.ProcObjectTimerCancel(backpack, "LLFULOOT_MoveItemsToCorpse")
+			Osi.ProcObjectTimer(backpack, "LLFULOOT_MoveItemsToCorpse", 250)
+		end
+	end
+end)
+
+local function _RestartLootableTimer(guid)
+	if CharacterIsDead(guid) == 1 or HasActiveStatus(guid, "DYING") == 1 then
+		guid = GetGUID(guid)
+		Osi.ProcObjectTimerCancel(guid, "LLFULOOT_MakeItemsLootable")
+		Osi.ProcObjectTimer(guid, "LLFULOOT_MakeItemsLootable", 500)
+	end
+end
+
+---@param guid string
+Ext.Osiris.RegisterListener("TradeGenerationEnded", 1, "after", _RestartLootableTimer)
+
+Ext.Osiris.RegisterListener("ItemAddedToCharacter", 2, "after", function (itemGUID, charGUID)
+	_RestartLootableTimer(charGUID)
 end)
 
 LootHelpers = {
